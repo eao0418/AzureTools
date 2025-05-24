@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>AzureTools.Client</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Graph" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AzureTools.Authentication\AzureTools.Authentication.csproj" />
+  </ItemGroup>
+  
+</Project>
