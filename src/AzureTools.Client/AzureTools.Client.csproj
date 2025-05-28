@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AzureTools.Authentication\AzureTools.Authentication.csproj" />
+    <ProjectReference Include="..\AzureTools.Repository\AzureTools.Repository.csproj" />
   </ItemGroup>
   
 </Project>

@@ -5,6 +5,7 @@ namespace AzureTools
 {
 	using Microsoft.Extensions.DependencyInjection;
 	using Microsoft.Extensions.Hosting;
+    using AzureTools.Client;
 
     internal class Program
     {
@@ -14,8 +15,13 @@ namespace AzureTools
             .ConfigureFunctionsWorkerDefaults()
 			.ConfigureServices(service =>
 			{
-				service.AddHttpClient();
-			})
+				service.AddHttpClient<GraphClient>(client =>
+                {
+                    client.BaseAddress = new Uri("https://graph.microsoft.com/");
+                    client.DefaultRequestHeaders.Add("Accept", "application/json");
+                });
+                service.AddHttpClient<GraphClient>();
+            })
             .Build();
 
             await host.RunAsync();

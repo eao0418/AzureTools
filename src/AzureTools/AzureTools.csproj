@@ -11,11 +11,15 @@
     <AssemblyName>AzureTools</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="Azure.Identity" />
-    <PackageVersion Include="Microsoft.Azure.Functions.Worker" />
-    <PackageVersion Include="Microsoft.Azure.Functions.Worker.Extensions.Http" />
-    <PackageVersion Include="Microsoft.Azure.Functions.Worker.Sdk" />
-    <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.EventHubs" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" />
+    <PackageReference Include="Azure.Identity" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AzureTools.Client\AzureTools.Client.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

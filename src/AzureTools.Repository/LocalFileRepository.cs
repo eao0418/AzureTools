@@ -3,6 +3,9 @@
 
 namespace AzureTools.Repository
 {
+    using AzureTools.Repository.Model;
+    using System.Text.Json;
+
     /// <summary>
     /// Object repository implementation that writes to a local file.
     /// </summary>
@@ -12,28 +15,32 @@ namespace AzureTools.Repository
 
         /// <inheritdoc/>
         public async Task WriteAsync<T>(IEnumerable<T> items)
+            where T: DtoBase
         {
             if (items == null || !items.Any())
             {
                 return;
             }
 
+            var executionId = items.First().ExecutionId;
+
             var typeName = typeof(T).Name;
             var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-            var fileName = $"{typeName}-{timeStamp}.txt";
+            var fileName = $"{executionId}-{typeName}-{timeStamp}.txt";
             var filePath = Path.Combine(Environment.CurrentDirectory, fileName);
+
+            var json = JsonSerializer.Serialize(
+                items,
+                new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+                });
 
             using (var writer = new StreamWriter(filePath))
             {
-                foreach (var item in items)
-                {
-                    if (item == null)
-                    {
-                        continue;
-                    }
-                    await writer.WriteLineAsync(item.ToString());
-                }
+                await writer.WriteAsync(json);
             }
         }
     }

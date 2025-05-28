@@ -3,6 +3,7 @@
 
 namespace AzureTools.Repository
 {
+    using AzureTools.Repository.Model;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
@@ -17,6 +18,6 @@ namespace AzureTools.Repository
         /// <typeparam name="T">The type of the object.</typeparam>
         /// <param name="items">The collection of items.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        Task WriteAsync<T>(IEnumerable<T> items);
+        Task WriteAsync<T>(IEnumerable<T> items) where T : DtoBase;
     }
 }
