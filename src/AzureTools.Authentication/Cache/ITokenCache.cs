@@ -30,6 +30,6 @@ namespace AzureTools.Authentication.Cache
         /// <param name="authSettings">The <see cref="AuthenticationSettings"/>.</param>
         /// <param name="stopToken">Cancellation token to cancel the operation.</param>
         /// <returns>An auth token for Graph.</returns>
-        public Task<string> GetOrAddTokenAsync(AuthenticationSettings authenticationSettings, CancellationToken stopToken)
+        public Task<string> GetOrAddTokenAsync(AuthenticationSettings authenticationSettings, CancellationToken stopToken);
     }
 }

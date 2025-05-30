@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageVersion Include="Azure.Identity" />
+    <PackageReference Include="Azure.Identity" />
   </ItemGroup>
 
 </Project>

@@ -3,8 +3,6 @@
 
 namespace AzureTools.Client
 {
-    using Microsoft.Graph.Models.TermStore;
-
     public static class Endpoints
     {
         private const string BetaVersion = "beta";
@@ -16,15 +14,6 @@ namespace AzureTools.Client
         public static string ApplicationRegistrationEndpoint => $"/{Version}/applications?top=150&$select=id,displayName,appId,owners,publicClient,createdDateTime,signInAudience,identifierUris,requiredResourceAccess,appRoles,keyCredentials,passwordCredentials,verifiedPublisher,federatedIdentityCredentials";
         public static string DirectoryRolesEndpoint => $"/{Version}/directoryRoles?$select=id,displayName,roleTemplateId,description,members,createdDateTime";
         public static string ApplicationOwnersEndpoint => $"/{Version}/applications/{{applicationId}}/owners?$select=id,displayName,userPrincipalName,mail,createdDateTime";
-
-public class DirectoryRoleSecurityInfo
-{
-    public string Id { get; set; } = string.Empty; // Unique role ID
-    public string DisplayName { get; set; } = string.Empty; // Role name (e.g., "Global Admin")
-    public string RoleTemplateId { get; set; } = string.Empty; // Role template reference
-    public string Description { get; set; } = string.Empty; // Role responsibilities
-    public List<string> Members { get; set; } = new List<string>(); // Assigned users & groups
-    public DateTime CreatedDateTime { get; set; } // Role creation timestamp
-}";
     }
 }
+

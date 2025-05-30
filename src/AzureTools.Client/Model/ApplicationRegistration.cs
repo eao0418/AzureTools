@@ -6,7 +6,7 @@ namespace AzureTools.Client.Model
     using System;
     using System.Collections.Generic;
 
-    internal class ApplicationRegistration : ModelBase
+    public class ApplicationRegistration : ModelBase
     {
         public string Id { get; set; } = string.Empty;
         public string DisplayName { get; set; } = string.Empty;

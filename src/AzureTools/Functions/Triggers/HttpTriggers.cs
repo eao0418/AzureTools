@@ -1,12 +1,12 @@
 
-namespace AzureTools.Triggers
+namespace AzureTools.Automation.Functions.Triggers
 {
-	using System.Net;
-	using Microsoft.Azure.Functions.Worker;
-	using Microsoft.Azure.Functions.Worker.Http;
-	using Microsoft.Extensions.Logging;
+    using System.Net;
+    using Microsoft.Azure.Functions.Worker;
+    using Microsoft.Azure.Functions.Worker.Http;
+    using Microsoft.Extensions.Logging;
 
-	public class HttpTriggers
+    public class HttpTriggers
     {
         private readonly ILogger _logger;
 
