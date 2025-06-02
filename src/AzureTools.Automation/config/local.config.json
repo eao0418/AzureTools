@@ -1,0 +1,6 @@
+﻿{
+  "authSettings": {
+    "tenantId": "<placeholder>",
+    "audience": "https://graph.microsoft.com/"
+  }
+}

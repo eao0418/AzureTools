@@ -1,0 +1,14 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+    "BrokerList": "localhost:9092",
+    "ConsumerGroup": "console-consumer-",
+    "KafkaConnection": "",
+    "ConnectionString": "",
+    "AzureWebJobs.StartGraphUserCollection.Disabled": "true",
+    "AzureWebJobs.StartGraphGroupCollection.Disabled": "true",
+    "AzureWebJobs.StartGraphApplicationRegistrationCollection.Disabled": "true"
+  }
+}

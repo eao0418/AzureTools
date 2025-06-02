@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureTools.Automation", "AzureTools\AzureTools.Automation.csproj", "{82E66FA5-6801-4DD9-A42E-F7FB5BBFCC28}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureTools.Automation", "AzureTools.Automation\AzureTools.Automation.csproj", "{82E66FA5-6801-4DD9-A42E-F7FB5BBFCC28}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureTools.Authentication", "AzureTools.Authentication\AzureTools.Authentication.csproj", "{EB8C6EDE-C49E-4245-A748-182B948B25EB}"
 EndProject

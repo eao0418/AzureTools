@@ -11,18 +11,25 @@ namespace AzureTools.Client
     using AzureTools.Client.Model;
     using System.Net.Http;
     using System.Net.Http.Json;
+    using Microsoft.Extensions.Logging;
+    using Azure;
+    using System.Text.Json;
 
     public sealed class GraphClient : IGraphClient
     {
         private readonly ITokenCache _tokenCache;
         private readonly HttpClient _httpClient;
+        private readonly ILogger<GraphClient> _logger;
 
         public GraphClient(
             ITokenCache tokenCache,
-            HttpClient httpClient)
+            HttpClient httpClient,
+            ILogger<GraphClient> logger)
         {
             _tokenCache = tokenCache ?? throw new ArgumentNullException(nameof(tokenCache));
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _httpClient.BaseAddress = new Uri("https://graph.microsoft.com");
         }
 
         public async Task<ODataResponse<User>?> GetUsersAsync(AuthenticationSettings settings, string? executionId = default, CancellationToken stopToken = default)
@@ -32,6 +39,8 @@ namespace AzureTools.Client
             {
                 executionId = Guid.NewGuid().ToString();
             }
+
+            _logger.LogInformation("Getting users from Graph API with execution ID: {ExecutionId} with endpoint {e}", executionId, Endpoints.UsersEndpoint);
 
             return await GetGraphObjectsAsync<User>(settings, Endpoints.UsersEndpoint, executionId, stopToken);
         }
@@ -237,8 +246,26 @@ namespace AzureTools.Client
         {
             _httpClient.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await _tokenCache.GetOrAddTokenAsync(settings, stopToken));
+            ODataResponse<T> response;
+            try
+            {
+                var httpResponse = await _httpClient.GetAsync(url, stopToken);
 
-            var response = await _httpClient.GetFromJsonAsync<ODataResponse<T>>(url, stopToken);
+                if (!httpResponse.IsSuccessStatusCode)
+                {
+                    var content = await httpResponse.Content.ReadAsStringAsync(stopToken);
+                    _logger.LogError("Failed to retrieve OData response from {Url}. Status code: {StatusCode}", url, httpResponse.StatusCode);
+                    _logger.LogError("Response content: {Content}", content);
+                    throw new HttpRequestException($"Request to {url} failed with status code {httpResponse.StatusCode}");
+                }
+                response = await httpResponse.Content.ReadFromJsonAsync<ODataResponse<T>>(new JsonSerializerOptions { PropertyNameCaseInsensitive = true }, stopToken)
+                           ?? throw new InvalidOperationException("Failed to deserialize OData response.");
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Error retrieving OData response from {Url}", url);
+                throw;
+            }
 
             if (response == null)
             {
