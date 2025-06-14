@@ -1,10 +1,9 @@
-﻿namespace AzureTools.Automation.Messaging
+﻿// KafkaMessage.cs Copyright (c) Aaron Randolph. All rights reserved.
+// Licensed under the MIT license. See License.txt in the project root for license information.
+
+namespace AzureTools.Automation.Messaging
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
 
     public class KafkaMessage
     {

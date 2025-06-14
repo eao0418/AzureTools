@@ -4,6 +4,7 @@
 namespace AzureTools.Client.Model
 {
     using AzureTools.Repository.Model;
+    using System;
 
     public class ModelBase : DtoBase
     {

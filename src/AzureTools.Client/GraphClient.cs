@@ -12,7 +12,6 @@ namespace AzureTools.Client
     using System.Net.Http;
     using System.Net.Http.Json;
     using Microsoft.Extensions.Logging;
-    using Azure;
     using System.Text.Json;
 
     public sealed class GraphClient : IGraphClient
@@ -206,7 +205,7 @@ namespace AzureTools.Client
         public async Task<ODataResponse<T>?> GetGraphObjectsAsync<T>(AuthenticationSettings settings, string endpoint, string executionId, CancellationToken stopToken)
             where T : ModelBase
         {
-            var objectResponse = await GetODataResponseAsync<T>(Endpoints.UsersEndpoint, settings, stopToken);
+            var objectResponse = await GetODataResponseAsync<T>(endpoint, settings, stopToken);
 
             if (objectResponse == null || objectResponse.Value == null)
             {

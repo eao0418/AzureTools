@@ -9,6 +9,7 @@ namespace AzureTools.Automation.Functions.Triggers
     using Microsoft.Azure.Functions.Worker;
     using Microsoft.Extensions.Logging;
     using System.Text.Json;
+    using System.Threading.Tasks;
 
     public class QueueTriggers
     {
@@ -22,23 +23,28 @@ namespace AzureTools.Automation.Functions.Triggers
             _graphCollector = graphCollector;
         }
 
-        /*
-        public QueueTriggers(ILogger<QueueTriggers> logger)
-        {
-            _logger = logger;
-        }
-        */
-
         [Function(nameof(ProcessObjectEnumerationQueue))]
         public async Task ProcessObjectEnumerationQueue(
             [KafkaTrigger(
                "%BrokerList%",
-               "ObjectEnumeration",
+               MessageTopics.ObjectEnumerationTopic,
                ConsumerGroup = "%ConsumerGroup%",
                Username = "%KafkaConnection%",
                Password = "%ConnectionString%")] string kafkaEvent, FunctionContext functionContext)
         {
-            var request = JsonSerializer.Deserialize<EnumerationRequest>(kafkaEvent);
+
+
+            var message = JsonDocument.Parse(kafkaEvent);
+            var parsed = message.RootElement
+                .GetProperty("Value")
+                .GetString();
+
+            if (string.IsNullOrWhiteSpace(parsed))
+            {
+                return;
+            }
+
+            var request = JsonUtil.Deserialize<EnumerationRequest>(parsed);
 
             if (request == null)
             {
@@ -70,20 +76,74 @@ namespace AzureTools.Automation.Functions.Triggers
         }
 
         [Function(nameof(ProcessGroupMemberEnumerationQueue))]
-        public void ProcessGroupMemberEnumerationQueue(
+        public async Task ProcessGroupMemberEnumerationQueue(
             [KafkaTrigger(
                "%BrokerList%",
-               "GroupMemberEnumeration",
+               MessageTopics.GroupMembershipTopic,
                ConsumerGroup = "%ConsumerGroup%",
                Username = "%KafkaConnection%",
-               Password = "%ConnectionString%")] string kafkaMessage , FunctionContext functionContext)
+               Password = "%ConnectionString%")] string kafkaMessage, FunctionContext functionContext)
         {
-            
+
             Console.WriteLine($"Received message: {kafkaMessage}");
 
-            var request = JsonSerializer.Deserialize<KafkaMessage>(kafkaMessage);
+            var message = JsonDocument.Parse(kafkaMessage);
+            var parsed = message.RootElement
+                .GetProperty("Value")
+                .GetString();
 
-            Console.WriteLine($"Deserialized message: {request?.Value}");
+            if (string.IsNullOrWhiteSpace(parsed))
+            {
+                return;
+            }
+
+            var request = JsonUtil.Deserialize<GroupMembershipMessage>(parsed);
+
+            if (request == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(request.ODataNextLink))
+            {
+                await _graphCollector.CollectGroupMembersAsync(request, functionContext.CancellationToken);
+            }
+            else // perform an enumeration request.
+            {
+                await _graphCollector.CollectNextGroupMembershipAsync(request, functionContext.CancellationToken);
+            }
+        }
+
+        [Function(nameof(ProcessApplicationRegistrationOwnerQueue))]
+        public async Task ProcessApplicationRegistrationOwnerQueue(
+            [KafkaTrigger(
+               "%BrokerList%",
+               MessageTopics.ApplicationRegistrationOwnersTopic,
+               ConsumerGroup = "%ConsumerGroup%",
+               Username = "%KafkaConnection%",
+               Password = "%ConnectionString%")] string kafkaMessage, FunctionContext functionContext)
+        {
+            var message = JsonDocument.Parse(kafkaMessage);
+            var parsed = message.RootElement
+                .GetProperty("Value")
+                .GetString();
+
+            if (string.IsNullOrWhiteSpace(parsed))
+            {
+                return;
+            }
+
+            var request = JsonUtil.Deserialize<AppRegistrationOwnerRequest>(parsed);    
+
+            if (request == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(request.ODataNextLink))
+            {
+                await _graphCollector.CollectApplicationRegistrationOwnersAsync(request, functionContext.CancellationToken);
+            }
         }
     }
 }

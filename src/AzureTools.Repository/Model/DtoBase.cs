@@ -3,12 +3,15 @@
 
 namespace AzureTools.Repository.Model
 {
+    /// <summary>
+    /// A base class for writing properties that are common to all Data Transfer Objects (DTOs) used in the Azure Tools repository.
+    /// </summary>
     public class DtoBase
     {
         /// <summary>
         /// /// The time the object info was collected and converted from the Graph API.
         /// </summary>
-        public DateTime CollectionTime = DateTime.UtcNow;
+        public DateTime RecordGenerateTime { get; set; } = DateTime.UtcNow;
 
         /// <summary>
         /// The unique identifier for this data run.

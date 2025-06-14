@@ -55,3 +55,6 @@ nunit-*.xml
 
 # VS and VSCode
 .vs/
+
+# custom
+src/AzureTools.Automation/config/local.config.json

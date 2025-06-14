@@ -11,20 +11,11 @@ namespace AzureTools.Client.Model
         public string Id { get; set; } = string.Empty;
         public string DisplayName { get; set; } = string.Empty;
         public string AppId { get; set; } = string.Empty;
-        public string ApplicationType { get; set; } = string.Empty;
         public string ServicePrincipalType { get; set; } = string.Empty;
-        public List<string> AppRoles { get; set; } = new List<string>();
-        public List<string> Owners { get; set; } = new List<string>();
-        public List<string> DelegatedPermissions { get; set; } = new List<string>();
+        public List<object> AppRoles { get; set; } = new ();
         public bool AccountEnabled { get; set; }
-        public bool PasswordCredentialsPresent { get; set; }
-        public bool KeyCredentialsPresent { get; set; }
-        /// <summary>
-        /// MSIs associated with the service principal.
-        /// </summary>
-        public List<string> ManagedIdentities { get; set; } = new List<string>();
-        public bool IsOauth2PermissionGrantRestricted { get; set; }
         public bool IsAssignRoleRestricted { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("appRoleAssignmentRequired")]
         public bool IsAppRoleAssignmentRequired { get; set; }
         public DateTime CreatedDateTime { get; set; }
         public DateTime RenewedDateTime { get; set; }

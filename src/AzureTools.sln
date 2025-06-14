@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureTools.Utility", "Azure
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureTools.Repository", "AzureTools.Repository\AzureTools.Repository.csproj", "{3D529181-10AC-44AB-806B-9BD116D7B1A7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureTools.Kusto", "AzureTools.Kusto\AzureTools.Kusto.csproj", "{FFEDC5A7-53C9-47E5-902A-6FD95826B154}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,18 @@ Global
 		{3D529181-10AC-44AB-806B-9BD116D7B1A7}.Release|x64.Build.0 = Release|Any CPU
 		{3D529181-10AC-44AB-806B-9BD116D7B1A7}.Release|x86.ActiveCfg = Release|Any CPU
 		{3D529181-10AC-44AB-806B-9BD116D7B1A7}.Release|x86.Build.0 = Release|Any CPU
+		{FFEDC5A7-53C9-47E5-902A-6FD95826B154}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFEDC5A7-53C9-47E5-902A-6FD95826B154}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFEDC5A7-53C9-47E5-902A-6FD95826B154}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FFEDC5A7-53C9-47E5-902A-6FD95826B154}.Debug|x64.Build.0 = Debug|Any CPU
+		{FFEDC5A7-53C9-47E5-902A-6FD95826B154}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FFEDC5A7-53C9-47E5-902A-6FD95826B154}.Debug|x86.Build.0 = Debug|Any CPU
+		{FFEDC5A7-53C9-47E5-902A-6FD95826B154}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFEDC5A7-53C9-47E5-902A-6FD95826B154}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFEDC5A7-53C9-47E5-902A-6FD95826B154}.Release|x64.ActiveCfg = Release|Any CPU
+		{FFEDC5A7-53C9-47E5-902A-6FD95826B154}.Release|x64.Build.0 = Release|Any CPU
+		{FFEDC5A7-53C9-47E5-902A-6FD95826B154}.Release|x86.ActiveCfg = Release|Any CPU
+		{FFEDC5A7-53C9-47E5-902A-6FD95826B154}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

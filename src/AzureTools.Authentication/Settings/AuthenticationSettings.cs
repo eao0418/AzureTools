@@ -3,11 +3,15 @@
 
 namespace AzureTools.Authentication.Settings
 {
+    using AzureTools.Utility.Settings;
+
     /// <summary>
     /// Represents the authentication settings for the Azure Tools library.
     /// </summary>
-    public class AuthenticationSettings
+    public class AuthenticationSettings: SettingsBase
     {
+        public new const string ConfigurationSectionName = "authenticationSettings";
+
         /// <summary>
         /// The authentication type to use. The default is <see cref="AuthenticationType.Default"/>.
         /// </summary>

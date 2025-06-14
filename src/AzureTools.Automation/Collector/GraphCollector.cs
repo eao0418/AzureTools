@@ -66,14 +66,14 @@ namespace AzureTools.Automation.Collector
             {
                 var nextRequest = new EnumerationRequest
                 {
-                    Url = usersResponse.ODataNextLink,
-                    SettingKey = _authSettings.GetAuthKey(),
+                    ODataNextLink = usersResponse.ODataNextLink,
+                    AuthSettingsKey = _authSettings.GetAuthKey(),
                     TenantId = tenantId,
-                    executionId = executionId,
+                    ExecutionId = executionId,
                     ObjectType = typeof(User)
                 };
 
-                await _messageFactory.SendMessageAsync("ObjectEnumeration", "request", JsonUtil.Serialize(nextRequest));
+                await _messageFactory.SendMessageAsync(MessageTopics.ObjectEnumerationTopic, "request", JsonUtil.Serialize(nextRequest));
             }
             else
             {
@@ -97,18 +97,18 @@ namespace AzureTools.Automation.Collector
             }
 
             // Write group Ids to the queue for group memebership processing.
+            // string authSettingsKey, string tenantId, string groupId, string? executionId = default
             foreach (var group in groupsResponse.Value)
             {
-                var groupMembershipRequest = new EnumerationRequest
+                var groupMembershipRequest = new GroupMembershipMessage
                 {
-                    Url = string.Empty, // This will be filled in later.
-                    SettingKey = _authSettings.GetAuthKey(),
+                    AuthSettingsKey = _authSettings.GetAuthKey(),
                     TenantId = tenantId,
-                    executionId = executionId,
-                    ObjectType = typeof(GroupMember)
+                    ExecutionId = executionId,
+                    GroupId = group.Id,
                 };
                 // Create a message for each group to process its members.
-                await _messageFactory.SendMessageAsync("GroupMemberEnumeration", "id", group.Id);
+                await _messageFactory.SendMessageAsync(MessageTopics.GroupMembershipTopic, "GroupMember", JsonUtil.Serialize(groupMembershipRequest));
             }
 
             await _objectRepository.WriteAsync(groupsResponse.Value);
@@ -118,14 +118,14 @@ namespace AzureTools.Automation.Collector
             {
                 var nextRequest = new EnumerationRequest
                 {
-                    Url = groupsResponse.ODataNextLink,
-                    SettingKey = _authSettings.GetAuthKey(),
+                    ODataNextLink = groupsResponse.ODataNextLink,
+                    AuthSettingsKey = _authSettings.GetAuthKey(),
                     TenantId = tenantId,
-                    executionId = executionId,
+                    ExecutionId = executionId,
                     ObjectType = typeof(Group)
                 };
 
-                await _messageFactory.SendMessageAsync("ObjectEnumeration", "request", JsonUtil.Serialize(nextRequest));
+                await _messageFactory.SendMessageAsync(MessageTopics.ObjectEnumerationTopic, "request", JsonUtil.Serialize(nextRequest));
             }
             else
             {
@@ -155,14 +155,14 @@ namespace AzureTools.Automation.Collector
             {
                 var nextRequest = new EnumerationRequest
                 {
-                    Url = serviceprincipalresponse.ODataNextLink,
-                    SettingKey = _authSettings.GetAuthKey(),
+                    ODataNextLink = serviceprincipalresponse.ODataNextLink,
+                    AuthSettingsKey = _authSettings.GetAuthKey(),
                     TenantId = tenantId,
-                    executionId = executionId,
+                    ExecutionId = executionId,
                     ObjectType = typeof(ServicePrincipal)
                 };
 
-                await _messageFactory.SendMessageAsync("ObjectEnumeration", "request", JsonUtil.Serialize(nextRequest));
+                await _messageFactory.SendMessageAsync(MessageTopics.ObjectEnumerationTopic, "request", JsonUtil.Serialize(nextRequest));
             }
             else
             {
@@ -188,22 +188,117 @@ namespace AzureTools.Automation.Collector
             await _objectRepository.WriteAsync(appRegistrationResponse.Value);
             _logger.LogInformation("Successfully collected {Count} ApplicationRegistration for tenant {TenantId}", appRegistrationResponse.Value.Count(), tenantId);
 
+            foreach (var app in appRegistrationResponse.Value)
+            {
+                var appOwnerRequest = new AppRegistrationOwnerRequest
+                {
+                    AuthSettingsKey = _authSettings.GetAuthKey(),
+                    TenantId = tenantId,
+                    ExecutionId = executionId,
+                    AppId = app.Id
+                };
+
+                await _messageFactory.SendMessageAsync(MessageTopics.ApplicationRegistrationOwnersTopic, "AppRegistrationOwner", JsonUtil.Serialize(appOwnerRequest));
+            }
+
             if (string.IsNullOrWhiteSpace(appRegistrationResponse?.ODataNextLink) is false)
             {
                 var nextRequest = new EnumerationRequest
                 {
-                    Url = appRegistrationResponse.ODataNextLink,
-                    SettingKey = _authSettings.GetAuthKey(),
+                    ODataNextLink = appRegistrationResponse.ODataNextLink,
+                    AuthSettingsKey = _authSettings.GetAuthKey(),
                     TenantId = tenantId,
-                    executionId = executionId,
+                    ExecutionId = executionId,
                     ObjectType = typeof(ApplicationRegistration)
                 };
 
-                await _messageFactory.SendMessageAsync("ObjectEnumeration", "request", JsonUtil.Serialize(nextRequest));
+                await _messageFactory.SendMessageAsync(MessageTopics.ObjectEnumerationTopic, "request", JsonUtil.Serialize(nextRequest));
             }
             else
             {
                 _logger.LogInformation("No more pages of ApplicationRegistration to collect for tenant {TenantId}", tenantId);
+                return;
+            }
+        }
+
+        public async Task CollectApplicationRegistrationOwnersAsync(AppRegistrationOwnerRequest request, CancellationToken stopToken = default)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request), "Application registration owner request cannot be null.");
+            }
+
+            _logger.LogInformation("Collecting application registration owners for app {AppId} in tenant {TenantId} with execution ID {ExecutionId} using auth settings key {AuthSettingsKey}",
+                request.AppId, request.TenantId, request.ExecutionId, request.AuthSettingsKey);
+
+            var result = await _graphClient.GetApplicationRegistrationOwnersAsync(request.AuthSettingsKey, request.TenantId, request.AppId, request.ExecutionId, stopToken);
+            
+            if (result?.Value == null || result.Value.Count == 0)
+            {
+                _logger.LogWarning("No owners found for application registration {AppId} in tenant {TenantId}", request.AppId, request.TenantId);
+                return;
+            }
+
+            await _objectRepository.WriteAsync(result.Value);
+
+            _logger.LogInformation("Successfully collected {Count} owners for application registration {AppId} in tenant {TenantId}", result.Value.Count(), request.AppId, request.TenantId);
+
+            if (string.IsNullOrWhiteSpace(result?.ODataNextLink) is false)
+            {
+                var nextRequest = new AppRegistrationOwnerRequest
+                {
+                    ODataNextLink = result.ODataNextLink,
+                    AuthSettingsKey = request.AuthSettingsKey,
+                    TenantId = request.TenantId,
+                    ExecutionId = request.ExecutionId,
+                    AppId = request.AppId
+                };
+                await _messageFactory.SendMessageAsync(MessageTopics.ApplicationRegistrationOwnersTopic, "AppRegistrationOwner", JsonUtil.Serialize(nextRequest));
+            }
+            else
+            {
+                _logger.LogInformation("No more pages of application registration owners to collect for app {AppId} in tenant {TenantId}", request.AppId, request.TenantId);
+                return;
+            }
+        }
+
+        public async Task CollectNextApplicationRegistrationOwnersAsync(AppRegistrationOwnerRequest request, CancellationToken stopToken = default)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request), "Application registration owner request cannot be null.");
+            }
+
+            _logger.LogInformation("Collecting next page of application registration owners for app {AppId} in tenant {TenantId} with execution ID {ExecutionId} using auth settings key {AuthSettingsKey}",
+                request.AppId, request.TenantId, request.ExecutionId, request.AuthSettingsKey);
+
+            var result = await _graphClient.GetApplicationRegistrationOwnersAsync(request.ODataNextLink, request.AuthSettingsKey, request.TenantId, request.AppId, request.ExecutionId, stopToken);
+
+            if (result?.Value == null || result.Value.Count == 0)
+            {
+                _logger.LogWarning("No owners found for application registration {AppId} in tenant {TenantId}", request.AppId, request.TenantId);
+                return;
+            }
+
+            await _objectRepository.WriteAsync(result.Value);
+
+            _logger.LogInformation("Successfully collected {Count} owners for application registration {AppId} in tenant {TenantId}", result.Value.Count(), request.AppId, request.TenantId);
+
+            if (string.IsNullOrWhiteSpace(result?.ODataNextLink) is false)
+            {
+                var nextRequest = new AppRegistrationOwnerRequest
+                {
+                    ODataNextLink = result.ODataNextLink,
+                    AuthSettingsKey = request.AuthSettingsKey,
+                    TenantId = request.TenantId,
+                    ExecutionId = request.ExecutionId,
+                    AppId = request.AppId
+                };
+                await _messageFactory.SendMessageAsync(MessageTopics.ApplicationRegistrationOwnersTopic, "AppRegistrationOwner", JsonUtil.Serialize(nextRequest));
+            }
+            else
+            {
+                _logger.LogInformation("No more pages of application registration owners to collect for app {AppId} in tenant {TenantId}", request.AppId, request.TenantId);
                 return;
             }
         }
@@ -216,7 +311,7 @@ namespace AzureTools.Automation.Collector
 
             var directoryRoleResponse = await _graphClient.GetEntraDirectoryRoles(_authSettings, executionId, stopToken);
 
-            if (directoryRoleResponse?.Value == null)
+            if (directoryRoleResponse?.Value == null || directoryRoleResponse.Value.Count == 0)
             {
                 _logger.LogWarning("No DirectoryRole found for tenant {TenantId}", tenantId);
                 return;
@@ -229,20 +324,97 @@ namespace AzureTools.Automation.Collector
             {
                 var nextRequest = new EnumerationRequest
                 {
-                    Url = directoryRoleResponse.ODataNextLink,
-                    SettingKey = _authSettings.GetAuthKey(),
+                    ODataNextLink = directoryRoleResponse.ODataNextLink,
+                    AuthSettingsKey = _authSettings.GetAuthKey(),
                     TenantId = tenantId,
-                    executionId = executionId,
+                    ExecutionId = executionId,
                     ObjectType = typeof(DirectoryRole)
                 };
 
-                await _messageFactory.SendMessageAsync("ObjectEnumeration", "request", JsonUtil.Serialize(nextRequest)  );
+                await _messageFactory.SendMessageAsync(MessageTopics.ObjectEnumerationTopic, "request", JsonUtil.Serialize(nextRequest)  );
             }
             else
             {
                 _logger.LogInformation("No more pages of DirectoryRole to collect for tenant {TenantId}", tenantId);
                 return;
             }
+        }
+
+        public async Task CollectGroupMembersAsync(GroupMembershipMessage request, CancellationToken stopToken)
+        {
+            if (request == null)
+            {
+                throw new ArgumentNullException(nameof(request), "Membership request cannot be null.");
+            }
+
+            _logger.LogInformation("Collecting group members for group {GroupId} in tenant {TenantId} with execution ID {ExecutionId} using auth settings key {AuthSettingsKey}",
+                request.GroupId, request.TenantId, request.ExecutionId, request.AuthSettingsKey);
+
+            var result = await _graphClient.GetGroupMembershipAsync(request.AuthSettingsKey, request.TenantId, request.GroupId, request.ExecutionId, stopToken);
+
+            if (result?.Value == null || result.Value.Count == 0)
+            {
+                _logger.LogWarning("No members found for group {GroupId} in tenant {TenantId}", request.GroupId, request.TenantId);
+                return;
+            }
+
+            await _objectRepository.WriteAsync(result.Value);
+
+            _logger.LogInformation("Successfully collected {Count} members for group {GroupId} in tenant {TenantId}", result.Value.Count(), request.GroupId, request.TenantId);
+
+            if (string.IsNullOrWhiteSpace(result?.ODataNextLink) is false)
+            {
+                var nextRequest = new GroupMembershipMessage
+                {
+                    ODataNextLink = result.ODataNextLink,
+                    AuthSettingsKey = request.AuthSettingsKey,
+                    TenantId = request.TenantId,
+                    ExecutionId = request.ExecutionId,
+                    GroupId = request.GroupId
+                };
+
+                await _messageFactory.SendMessageAsync(MessageTopics.GroupMembershipTopic, "GroupMember", JsonUtil.Serialize(nextRequest));
+            }
+            else
+            {
+                _logger.LogInformation("No more pages of group members to collect for group {GroupId} in tenant {TenantId}", request.GroupId, request.TenantId);
+                return;
+            }
+        }
+
+        public async Task CollectNextGroupMembershipAsync(GroupMembershipMessage request, CancellationToken stopToken)
+        {
+            if (request is null)
+            {
+                return;
+            }
+
+            _logger.LogInformation("Collecting next group membership for group {GroupId} in tenant {TenantId} with execution ID {ExecutionId} using auth settings key {AuthSettingsKey}",
+                request.GroupId, request.TenantId, request.ExecutionId, request.AuthSettingsKey);
+
+            // Get the next page of group membership.
+            var result = await _graphClient.GetGroupMembershipAsync(request.ODataNextLink, request.AuthSettingsKey, request.TenantId, request.GroupId, request.ExecutionId, stopToken);
+
+            if (result is null || result.Value is null || result.Value.Count == 0)
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(result.ODataNextLink) is false)
+            {
+                var nextRequest = new GroupMembershipMessage
+                {
+                    ODataNextLink = result.ODataNextLink,
+                    AuthSettingsKey = request.AuthSettingsKey,
+                    TenantId = request.TenantId,
+                    ExecutionId = request.ExecutionId,
+                    GroupId = request.GroupId
+                };
+
+                await _messageFactory.SendMessageAsync(MessageTopics.GroupMembershipTopic, "GroupMember", JsonUtil.Serialize(nextRequest));
+            }
+
+            await _objectRepository.WriteAsync(result.Value);
         }
 
         public async Task CollectNextObjectAsync<T>(EnumerationRequest enumerationRequest, CancellationToken stopToken)
@@ -253,16 +425,16 @@ namespace AzureTools.Automation.Collector
                 throw new ArgumentNullException(nameof(enumerationRequest), "Enumeration request cannot be null.");
             }
             _logger.LogInformation("Collecting next object from URL {Url} for tenant {TenantId} with execution ID {ExecutionId}",
-                enumerationRequest.Url, enumerationRequest.TenantId, enumerationRequest.executionId);
+                enumerationRequest.ODataNextLink, enumerationRequest.TenantId, enumerationRequest.ExecutionId);
 
             var result = await _graphClient.GetGraphObjectsAsync<T>(
-                enumerationRequest.Url,
-                enumerationRequest.SettingKey,
+                enumerationRequest.ODataNextLink,
+                enumerationRequest.AuthSettingsKey,
                 enumerationRequest.TenantId,
-                enumerationRequest.executionId,
+                enumerationRequest.ExecutionId,
                 stopToken);
 
-            if (result?.Value == null)
+            if (result?.Value == null || result.Value.Count == 0)
             {
                 return;
             }
@@ -273,10 +445,10 @@ namespace AzureTools.Automation.Collector
             {
                 var nextRequest = new EnumerationRequest
                 {
-                    Url = result.ODataNextLink,
-                    SettingKey = _authSettings.GetAuthKey(),
+                    ODataNextLink = result.ODataNextLink,
+                    AuthSettingsKey = _authSettings.GetAuthKey(),
                     TenantId = enumerationRequest.TenantId,
-                    executionId = enumerationRequest.executionId,
+                    ExecutionId = enumerationRequest.ExecutionId,
                     ObjectType = typeof(T)
                 };
 

@@ -3,15 +3,13 @@
 
 namespace AzureTools
 {
+    using AzureTools.Automation.Collector;
+    using AzureTools.Automation.Messaging;
+    using AzureTools.Client;
+    using AzureTools.Repository;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using AzureTools.Client;
-    using AzureTools.Automation.Collector;
-    using AzureTools.Repository;
-    using AzureTools.Automation.Messaging;
-    using AzureTools.Authentication;
-    using Microsoft.Extensions.Configuration;
-    using AzureTools.Authentication.Settings;
 
     public class Program
     {
@@ -23,20 +21,13 @@ namespace AzureTools
                 config.AddJsonFile("config/local.config.json", optional: true, reloadOnChange: true);
                 config.AddEnvironmentVariables();
             })
-            .ConfigureFunctionsWorkerDefaults()
+            .ConfigureFunctionsWebApplication()
 			.ConfigureServices((context, service) =>
 			{
-				service.AddHttpClient<GraphClient>(client =>
-                {
-                    client.BaseAddress = new Uri("https://graph.microsoft.com");
-                    client.DefaultRequestHeaders.Add("Accept", "application/json");
-                });
-                service.Configure<AuthenticationSettings>(context.Configuration.GetSection("authSettings"));
+                service.AddGraphClient(context.Configuration);
                 service.AddSingleton<GraphCollector>();
-                service.AddSingleton<IGraphClient, GraphClient>();
-                service.AddSingleton<IObjectRepository, LocalFileRepository>();
-                service.AddSingleton<IMessageFactory, MessageFactory>();
-                service.AddAuthenticationServices();
+                service.AddKustoRepository(context.Configuration);
+                service.AddSingleton<IMessageFactory, KafkaMessageFactory>();
                 service.AddLogging();
             })
             .Build();

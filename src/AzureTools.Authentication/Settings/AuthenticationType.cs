@@ -3,9 +3,12 @@
 
 namespace AzureTools.Authentication.Settings
 {
+    using System.Text.Json.Serialization;
+
     /// <summary>
     /// Enumeration of authentication types.
     /// </summary>
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum AuthenticationType
     {
         /// <summary>
@@ -32,5 +35,6 @@ namespace AzureTools.Authentication.Settings
         /// Authentication using username and password.
         /// </summary>
         UsernamePassword,
+        VisualStudio
     }
 }

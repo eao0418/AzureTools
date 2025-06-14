@@ -87,7 +87,7 @@ namespace AzureTools.Authentication.Provider
             {
                 AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
             };
-            return new ClientSecretCredential(settings.TenantId, settings.ClientId, "placeholder", options);
+            return new ClientSecretCredential(settings.TenantId, settings.ClientId, settings.Password, options);
         }
 
 #pragma warning disable CS0618 // CS0618: Type or member is obsolete. The use here is intentional.
@@ -122,6 +122,28 @@ namespace AzureTools.Authentication.Provider
             return new DeviceCodeCredential(options);
         }
 
+        private TokenCredential GetInteractiveCredential(AuthenticationSettings settings)
+        {
+            var options = new InteractiveBrowserCredentialOptions
+            {
+                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
+                ClientId = settings.ClientId,
+                TenantId = settings.TenantId,
+            };
+            return new InteractiveBrowserCredential(options);
+        }
+
+        private TokenCredential GetGarbage(AuthenticationSettings settings)
+        {
+            
+            return new VisualStudioCredential(options: new VisualStudioCredentialOptions
+            {
+                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
+                TenantId = settings.TenantId,
+
+            });
+        }
+
         /// <summary>
         /// Initializes the credential factory with the supported authentication types and their corresponding credential creation methods.
         /// </summary>
@@ -131,6 +153,8 @@ namespace AzureTools.Authentication.Provider
             _credentialFactory.TryAdd(AuthenticationType.ClientSecret, new Func<AuthenticationSettings, TokenCredential>(GetClientSecretCredential));
             _credentialFactory.TryAdd(AuthenticationType.UsernamePassword, new Func<AuthenticationSettings, TokenCredential>(GetUsernamePasswordCredential));
             _credentialFactory.TryAdd(AuthenticationType.DeviceCode, new Func<AuthenticationSettings, TokenCredential>(GetDeviceCodeCredential));
+            _credentialFactory.TryAdd(AuthenticationType.Interactive, new Func<AuthenticationSettings, TokenCredential>(GetInteractiveCredential));
+            _credentialFactory.TryAdd(AuthenticationType.VisualStudio, new Func<AuthenticationSettings, TokenCredential>(GetGarbage));
         }
     }
 }

@@ -27,7 +27,7 @@ namespace AzureTools.Repository
             var typeName = typeof(T).Name;
             var timeStamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-            var fileName = $"{executionId}-{typeName}-{timeStamp}.txt";
+            var fileName = $"{executionId}-{typeName}-{timeStamp}.json";
             var filePath = Path.Combine(Environment.CurrentDirectory, fileName);
 
             var json = JsonSerializer.Serialize(
