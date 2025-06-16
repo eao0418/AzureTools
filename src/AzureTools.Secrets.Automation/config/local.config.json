@@ -1,7 +1,10 @@
 ﻿{
-  "authenticationSettings": {
-    "tenantId": "",
-    "audience": "https://graph.microsoft.com/"
+  "secretAutomationSettings": {
+    "authenticationSettings": {
+      "tenantId": "",
+      "audience": "https://graph.microsoft.com/"
+    },
+    "dataSourceName": "GraphData"
   },
   "kustoSettings": {
     "authenticationSettings": [
@@ -16,10 +19,5 @@
       }
     ]
   },
-  "repositorySettings": {
-    "repositoryType": "kusto",
-    "databaseName": "GraphData"
-  },
-  "graphClientSettings":{
-  }
+  "graphClientSettings": {}
 }

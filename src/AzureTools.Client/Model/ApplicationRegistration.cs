@@ -3,6 +3,7 @@
 
 namespace AzureTools.Client.Model
 {
+    using AzureTools.Client.Model.Application;
     using System;
     using System.Collections.Generic;
     using System.Text.Json;
@@ -19,7 +20,7 @@ namespace AzureTools.Client.Model
         public List<string> RequiredResourceAccess { get; set; } = new ();
         public List<string> AppRoles { get; set; } = new ();
         public List<JsonDocument> KeyCredentials { get; set; } = new ();
-        public List<JsonDocument> PasswordCredentials { get; set; } = new ();
+        public List<PasswordCredential> PasswordCredentials { get; set; } = new ();
         public List<FederatedIdentityCredential> FederatedIdentityCredentials { get; set; } = new List<FederatedIdentityCredential>();
         public Dictionary<string,object> VerifiedPublisher { get; set; } = new();
         public DateTime CreatedDateTime { get; set; }

@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "AzureTools.Secrets.Automation": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7072",
+      "launchBrowser": false
+    }
+  }
+}
