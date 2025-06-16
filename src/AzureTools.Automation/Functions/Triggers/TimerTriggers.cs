@@ -1,3 +1,5 @@
+// TimerTriggers.cs Copyright (c) Aaron Randolph. All rights reserved.
+// Licensed under the MIT license. See License.txt in the project root for license information.
 
 namespace AzureTools.Automation.Functions.Triggers
 {
@@ -84,6 +86,64 @@ namespace AzureTools.Automation.Functions.Triggers
             {
                 _logger.LogInformation("Data collection started.");
                 await _graphCollector.CollectAppRegistrationsAsync(
+                    context.InvocationId.ToString(),
+                    context.CancellationToken);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while collecting data.");
+            }
+            finally
+            {
+                _logger.LogInformation("C# Timer trigger function completed at: {time}", DateTime.Now);
+
+            }
+        }
+
+        [Function(nameof(StartGraphServicePrincipalCollection))]
+        [FixedDelayRetry(5, "00:00:10")]
+        public async Task StartGraphServicePrincipalCollection(
+                [TimerTrigger("0 */5 * * * *")] TimerInfo timerInfo,
+                FunctionContext context)
+        {
+            _logger.LogInformation("C# {trigger} Timer trigger function executed at: {time}",
+                nameof(StartGraphServicePrincipalCollection),
+                DateTime.Now);
+
+            try
+            {
+                _logger.LogInformation("Data collection started.");
+                await _graphCollector.CollectServicePrincipalsAsync(
+                    context.InvocationId.ToString(),
+                    context.CancellationToken);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while collecting data.");
+            }
+            finally
+            {
+                _logger.LogInformation("C# Timer trigger function completed at: {time}", DateTime.Now);
+
+            }
+        }
+
+        [Function(nameof(StartGraphDirectoryRoleCollection))]
+        [FixedDelayRetry(5, "00:00:10")]
+        public async Task StartGraphDirectoryRoleCollection(
+                [TimerTrigger("0 */5 * * * *")] TimerInfo timerInfo,
+                FunctionContext context)
+        {
+            _logger.LogInformation("C# {trigger} Timer trigger function executed at: {time}",
+                nameof(StartGraphDirectoryRoleCollection),
+                DateTime.Now);
+
+            try
+            {
+                _logger.LogInformation("Data collection started.");
+                await _graphCollector.CollectDirectoryRolesAsync(
                     context.InvocationId.ToString(),
                     context.CancellationToken);
 

@@ -5,6 +5,7 @@ namespace AzureTools.Client.Model
 {
     using System;
     using System.Collections.Generic;
+    using System.Text.Json.Serialization;
 
     public class GroupMember: ModelBase
     {
@@ -13,6 +14,7 @@ namespace AzureTools.Client.Model
         /// </summary>
         public string Id { get; set; } = string.Empty;
         public string GroupId { get; set; } = string.Empty;
+        [JsonPropertyName("@odata.type")]
         public string ObjectType { get; set; } = string.Empty;
         public string DisplayName { get; set; } = string.Empty;
         public string Mail { get; set; } = string.Empty;

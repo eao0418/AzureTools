@@ -1,6 +1,25 @@
 ﻿{
-  "authSettings": {
-    "tenantId": "<placeholder>",
+  "authenticationSettings": {
+    "tenantId": "",
     "audience": "https://graph.microsoft.com/"
+  },
+  "kustoSettings": {
+    "authenticationSettings": [
+      {
+        "authenticationType": "ClientSecret",
+        "databaseName": "GraphData",
+        "clusterUrl": "https://<placeholder>.kusto.windows.net",
+        "audience": "https://kusto.windows.net/",
+        "tenantId": "",
+        "password": "",
+        "clientId": ""
+      }
+    ]
+  },
+  "repositorySettings": {
+    "repositoryType": "kusto",
+    "databaseName": "GraphData"
+  },
+  "graphClientSettings":{
   }
 }

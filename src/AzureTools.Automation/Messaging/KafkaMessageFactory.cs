@@ -1,13 +1,16 @@
-﻿namespace AzureTools.Automation.Messaging
+﻿// KafkaMessageFactory.cs Copyright (c) Aaron Randolph. All rights reserved.
+// Licensed under the MIT license. See License.txt in the project root for license information.
+
+namespace AzureTools.Automation.Messaging
 {
     using Confluent.Kafka;
     using System.Collections.Concurrent;
 
-    public class MessageFactory : IDisposable, IMessageFactory
+    public sealed class KafkaMessageFactory : IDisposable, IMessageFactory
     {
         private ConcurrentDictionary<string, IProducer<string, string>> _producers = new();
 
-        public MessageFactory()
+        public KafkaMessageFactory()
         {
             Init();
         }
@@ -16,6 +19,7 @@
         {
             var bootstrapServers = Environment.GetEnvironmentVariable("BrokerList");
 
+            // TO-DO: make this cleaner and built off of configuration.
             var producer = new ProducerBuilder<string, string>(
                 new ProducerConfig
                 {
@@ -25,7 +29,7 @@
                     SaslPassword = ""
                 }).Build();
 
-            _producers.TryAdd("ObjectEnumeration", producer);
+            _producers.TryAdd(MessageTopics.ObjectEnumerationTopic, producer);
 
             var groupProducer = new ProducerBuilder<string, string>(
                 new ProducerConfig
@@ -36,7 +40,7 @@
                     SaslPassword = ""
                 }).Build();
 
-            _producers.TryAdd("GroupMemberEnumeration", groupProducer);
+            _producers.TryAdd(MessageTopics.GroupMembershipTopic, groupProducer);
 
             var appOwnerProducer = new ProducerBuilder<string, string>(
                 new ProducerConfig
@@ -47,14 +51,7 @@
                     SaslPassword = ""
                 }).Build();
 
-            _producers.TryAdd("AppOwnerEnumeration", appOwnerProducer);
-        }
-
-        public IProducer<string, string> GetProducerClient(string topicName)
-        {
-            return _producers.TryGetValue(topicName, out var producer)
-                ? producer
-                : throw new InvalidOperationException($"Producer for topic '{topicName}' not found.");
+            _producers.TryAdd(MessageTopics.ApplicationRegistrationOwnersTopic, appOwnerProducer);
         }
 
         public void Dispose()
@@ -66,11 +63,28 @@
             _producers.Clear();
         }
 
+        /// <inheritdoc/>
         public async Task SendMessageAsync(string topic, string key, string value)
         {
             if (_producers.TryGetValue(topic, out var producer))
             {
                 await producer.ProduceAsync(topic, new Message<string, string> { Key = key, Value = value });
+            }
+            else
+            {
+                throw new InvalidOperationException($"Producer for topic '{topic}' not found.");
+            }
+
+        }
+
+        /// <inheritdoc/>
+        public async Task SendMessageAsync<T>(string topic, string key, T value)
+        {
+            if (_producers.TryGetValue(topic, out var producer))
+            {
+                var jsonValue = JsonUtil.Serialize(value);
+
+                await producer.ProduceAsync(topic, new Message<string, string> { Key = key, Value = jsonValue });
             }
             else
             {

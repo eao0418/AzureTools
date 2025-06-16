@@ -9,10 +9,10 @@ namespace AzureTools.Client
     using System.Threading.Tasks;
     using System.Threading;
     using AzureTools.Client.Model;
+    using AzureTools.Client.Model.Application;
     using System.Net.Http;
     using System.Net.Http.Json;
     using Microsoft.Extensions.Logging;
-    using Azure;
     using System.Text.Json;
 
     public sealed class GraphClient : IGraphClient
@@ -20,6 +20,7 @@ namespace AzureTools.Client
         private readonly ITokenCache _tokenCache;
         private readonly HttpClient _httpClient;
         private readonly ILogger<GraphClient> _logger;
+        private readonly JsonSerializerOptions _addPasswordSerializerOptions;
 
         public GraphClient(
             ITokenCache tokenCache,
@@ -30,6 +31,14 @@ namespace AzureTools.Client
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _httpClient.BaseAddress = new Uri("https://graph.microsoft.com");
+
+            var serializerOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+            };
+            serializerOptions.Converters.Add(new Utility.Converter.EmptyStringToNullConverter());
+            _addPasswordSerializerOptions = serializerOptions;
         }
 
         public async Task<ODataResponse<User>?> GetUsersAsync(AuthenticationSettings settings, string? executionId = default, CancellationToken stopToken = default)
@@ -206,7 +215,7 @@ namespace AzureTools.Client
         public async Task<ODataResponse<T>?> GetGraphObjectsAsync<T>(AuthenticationSettings settings, string endpoint, string executionId, CancellationToken stopToken)
             where T : ModelBase
         {
-            var objectResponse = await GetODataResponseAsync<T>(Endpoints.UsersEndpoint, settings, stopToken);
+            var objectResponse = await GetODataResponseAsync<T>(endpoint, settings, stopToken);
 
             if (objectResponse == null || objectResponse.Value == null)
             {
@@ -239,6 +248,38 @@ namespace AzureTools.Client
             }
 
             return objectResponse;
+        }
+
+        public async Task<PasswordCredential?> AddApplicationPasswordAsync(
+            string id,
+            UpdatePasswordRequest updatePasswordRequest,
+            AuthenticationSettings authSettings,
+            CancellationToken stopToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                throw new ArgumentException("Application ID cannot be null or empty.", nameof(id));
+            }
+            if (updatePasswordRequest == null)
+            {
+                throw new ArgumentNullException(nameof(updatePasswordRequest));
+            }
+
+            var url = $"/v1.0/applications/{id}/addPassword";
+
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", await _tokenCache.GetOrAddTokenAsync(authSettings, stopToken));
+            
+            var response = await _httpClient.PostAsJsonAsync(url, updatePasswordRequest, _addPasswordSerializerOptions, stopToken);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                _logger.LogError("Failed to add application password. Status code: {StatusCode}, Content: {Content}", response.StatusCode, content);
+                throw new HttpRequestException($"Failed to add application password. Status code: {response.StatusCode}");
+            }
+
+            return await response.Content.ReadFromJsonAsync<PasswordCredential>(_addPasswordSerializerOptions, stopToken);
         }
 
         private async Task<ODataResponse<T>> GetODataResponseAsync<T>(string url, AuthenticationSettings settings, CancellationToken stopToken = default)

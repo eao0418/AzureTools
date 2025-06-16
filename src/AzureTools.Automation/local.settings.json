@@ -9,6 +9,8 @@
     "ConnectionString": "",
     "AzureWebJobs.StartGraphUserCollection.Disabled": "true",
     "AzureWebJobs.StartGraphGroupCollection.Disabled": "true",
-    "AzureWebJobs.StartGraphApplicationRegistrationCollection.Disabled": "true"
+    "AzureWebJobs.StartGraphApplicationRegistrationCollection.Disabled": "true",
+    "AzureWebJobs.StartGraphServicePrincipalCollection.Disabled": "true",
+    "AzureWebJobs.StartGraphDirectoryRoleCollection.Disabled": "true"
   }
 }

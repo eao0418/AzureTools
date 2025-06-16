@@ -5,6 +5,7 @@ namespace AzureTools.Client
 {
     using AzureTools.Authentication.Settings;
     using AzureTools.Client.Model;
+    using AzureTools.Client.Model.Application;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -21,5 +22,6 @@ namespace AzureTools.Client
         Task<ODataResponse<Group>?> GetGroupsAsync(AuthenticationSettings settings, string? executionId = null, CancellationToken stopToken = default);
         Task<ODataResponse<ServicePrincipal>?> GetServicePrincipalsAsync(AuthenticationSettings settings, string? executionId = null, CancellationToken stopToken = default);
         Task<ODataResponse<User>?> GetUsersAsync(AuthenticationSettings settings, string? executionId = null, CancellationToken stopToken = default);
+        Task<PasswordCredential?> AddApplicationPasswordAsync(string id, UpdatePasswordRequest updatePasswordRequest, AuthenticationSettings authSettings, CancellationToken stopToken = default);
     }
 }
