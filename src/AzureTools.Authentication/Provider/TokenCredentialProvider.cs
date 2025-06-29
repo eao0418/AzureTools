@@ -34,6 +34,7 @@ namespace AzureTools.Authentication.Provider
             {
                 AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
                 ExcludeManagedIdentityCredential = true,
+
             };
 
             return new DefaultAzureCredential(options);
@@ -129,11 +130,12 @@ namespace AzureTools.Authentication.Provider
                 AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
                 ClientId = settings.ClientId,
                 TenantId = settings.TenantId,
+                RedirectUri = new Uri("http://localhost"),
             };
             return new InteractiveBrowserCredential(options);
         }
 
-        private TokenCredential GetGarbage(AuthenticationSettings settings)
+        private TokenCredential GetVisualStudioCredential(AuthenticationSettings settings)
         {
             
             return new VisualStudioCredential(options: new VisualStudioCredentialOptions
@@ -154,7 +156,7 @@ namespace AzureTools.Authentication.Provider
             _credentialFactory.TryAdd(AuthenticationType.UsernamePassword, new Func<AuthenticationSettings, TokenCredential>(GetUsernamePasswordCredential));
             _credentialFactory.TryAdd(AuthenticationType.DeviceCode, new Func<AuthenticationSettings, TokenCredential>(GetDeviceCodeCredential));
             _credentialFactory.TryAdd(AuthenticationType.Interactive, new Func<AuthenticationSettings, TokenCredential>(GetInteractiveCredential));
-            _credentialFactory.TryAdd(AuthenticationType.VisualStudio, new Func<AuthenticationSettings, TokenCredential>(GetGarbage));
+            _credentialFactory.TryAdd(AuthenticationType.VisualStudio, new Func<AuthenticationSettings, TokenCredential>(GetVisualStudioCredential));
         }
     }
 }

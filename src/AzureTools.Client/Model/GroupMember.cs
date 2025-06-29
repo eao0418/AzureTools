@@ -21,8 +21,8 @@ namespace AzureTools.Client.Model
         public string UserPrincipalName { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
         public bool AccountEnabled { get; set; } 
-        public List<string> AssignedRoles { get; set; } = new List<string>(); 
-        public List<string> Devices { get; set; } = new List<string>(); 
+        public List<string> AssignedRoles { get; set; } = []; 
+        public List<string> Devices { get; set; } = []; 
         public DateTime CreatedDateTime { get; set; }
         public DateTime LastSignInDateTime { get; set; }
     }

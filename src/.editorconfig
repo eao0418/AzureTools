@@ -1,0 +1,2 @@
+[*.cs]
+file_header_template = {fileName} Copyright (c) Aaron Randolph. All rights reserved.\nLicensed under the MIT license. See License.txt in the project root for license information.

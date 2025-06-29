@@ -6,19 +6,13 @@ namespace AzureTools.Secrets.Automation.Triggers
     using Microsoft.Azure.Functions.Worker;
     using Microsoft.Extensions.Logging;
 
-    public class Timers
+    public class Timers(
+        ILogger<Timers> logger,
+        ApplicationCredentialManager applicationCredentialManager
+        )
     {
-        private readonly ILogger<Timers> _logger;
-        private readonly ApplicationCredentialManager _applicationCredentialManager;
-
-        public Timers(
-            ILogger<Timers> logger,
-            ApplicationCredentialManager applicationCredentialManager
-            )
-        {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _applicationCredentialManager = applicationCredentialManager ?? throw new ArgumentNullException(nameof(applicationCredentialManager));
-        }
+        private readonly ILogger<Timers> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        private readonly ApplicationCredentialManager _applicationCredentialManager = applicationCredentialManager ?? throw new ArgumentNullException(nameof(applicationCredentialManager));
 
         /// <summary>
         /// Checks and updates application credentials daily at 9:30 AM UTC.

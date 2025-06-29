@@ -23,13 +23,15 @@ namespace AzureTools.Automation.Functions.Triggers
 
             var outputDirectory = Path.Combine(Environment.CurrentDirectory, "resources");
 
-            await KustoTableGenerator.GenerateKustoTableCreateScript<ApplicationOwner>(outputDirectory);
-            await KustoTableGenerator.GenerateKustoTableCreateScript<ApplicationRegistration>(outputDirectory);
-            await KustoTableGenerator.GenerateKustoTableCreateScript<DirectoryRole>(outputDirectory);
-            await KustoTableGenerator.GenerateKustoTableCreateScript<Group>(outputDirectory);
-            await KustoTableGenerator.GenerateKustoTableCreateScript<GroupMember>(outputDirectory);
-            await KustoTableGenerator.GenerateKustoTableCreateScript<ServicePrincipal>(outputDirectory);
-            await KustoTableGenerator.GenerateKustoTableCreateScript<User>(outputDirectory);
+            await Task.WhenAll(
+                KustoTableGenerator.GenerateKustoTableCreateScript<ApplicationOwner>(outputDirectory),
+                KustoTableGenerator.GenerateKustoTableCreateScript<ApplicationRegistration>(outputDirectory),
+                KustoTableGenerator.GenerateKustoTableCreateScript<DirectoryRole>(outputDirectory),
+                KustoTableGenerator.GenerateKustoTableCreateScript<Group>(outputDirectory),
+                KustoTableGenerator.GenerateKustoTableCreateScript<GroupMember>(outputDirectory),
+                KustoTableGenerator.GenerateKustoTableCreateScript<ServicePrincipal>(outputDirectory),
+                KustoTableGenerator.GenerateKustoTableCreateScript<User>(outputDirectory)
+            );
 
             return new OkObjectResult("Done");
         }
@@ -41,13 +43,15 @@ namespace AzureTools.Automation.Functions.Triggers
 
             var outputDirectory = Path.Combine(Environment.CurrentDirectory, "resources");
 
-            await KustoTableGenerator.GenerateKustoTableIngestionMappingScriptAsync<ApplicationOwner>(outputDirectory);
-            await KustoTableGenerator.GenerateKustoTableIngestionMappingScriptAsync<ApplicationRegistration>(outputDirectory);
-            await KustoTableGenerator.GenerateKustoTableIngestionMappingScriptAsync<DirectoryRole>(outputDirectory);
-            await KustoTableGenerator.GenerateKustoTableIngestionMappingScriptAsync<Group>(outputDirectory);
-            await KustoTableGenerator.GenerateKustoTableIngestionMappingScriptAsync<GroupMember>(outputDirectory);
-            await KustoTableGenerator.GenerateKustoTableIngestionMappingScriptAsync<ServicePrincipal>(outputDirectory);
-            await KustoTableGenerator.GenerateKustoTableIngestionMappingScriptAsync<User>(outputDirectory);
+            await Task.WhenAll(
+                KustoTableGenerator.GenerateKustoTableIngestionMappingScriptAsync<ApplicationOwner>(outputDirectory),
+                KustoTableGenerator.GenerateKustoTableIngestionMappingScriptAsync<ApplicationRegistration>(outputDirectory),
+                KustoTableGenerator.GenerateKustoTableIngestionMappingScriptAsync<DirectoryRole>(outputDirectory),
+                KustoTableGenerator.GenerateKustoTableIngestionMappingScriptAsync<Group>(outputDirectory),
+                KustoTableGenerator.GenerateKustoTableIngestionMappingScriptAsync<GroupMember>(outputDirectory),
+                KustoTableGenerator.GenerateKustoTableIngestionMappingScriptAsync<ServicePrincipal>(outputDirectory),
+                KustoTableGenerator.GenerateKustoTableIngestionMappingScriptAsync<User>(outputDirectory)
+            );
 
             return new OkObjectResult("Done");
         }

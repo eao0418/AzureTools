@@ -1,4 +1,4 @@
-﻿// KustStreamWriter.cs Copyright (c) Aaron Randolph. All rights reserved.
+﻿// KustoSettings.cs Copyright (c) Aaron Randolph. All rights reserved.
 // Licensed under the MIT license. See License.txt in the project root for license information.
 
 namespace AzureTools.Kusto.Settings
@@ -12,6 +12,6 @@ namespace AzureTools.Kusto.Settings
 
         public new const string ConfigurationSectionName = "kustoSettings";
 
-        public List<KustoAuthenticationSettings> AuthenticationSettings { get; set; } = new();
+        public List<KustoAuthenticationSettings> AuthenticationSettings { get; set; } = [];
     }
 }

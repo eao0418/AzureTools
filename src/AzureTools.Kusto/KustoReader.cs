@@ -1,4 +1,4 @@
-﻿// KustStreamWriter.cs Copyright (c) Aaron Randolph. All rights reserved.
+﻿// KustoReader.cs Copyright (c) Aaron Randolph. All rights reserved.
 // Licensed under the MIT license. See License.txt in the project root for license information.
 
 namespace AzureTools.Kusto
@@ -73,12 +73,8 @@ namespace AzureTools.Kusto
 
             foreach (var authSettings in _settings.AuthenticationSettings)
             {
-                var connectionString = _connectionStringProvider.GetConnectionString(authSettings);
-                if (connectionString is null)
-                {
+                var connectionString = _connectionStringProvider.GetConnectionString(authSettings) ??
                     throw new InvalidOperationException($"Connection string for {authSettings.ClusterUrl} is not configured.");
-                }
-
                 var provider = KustoClientFactory.CreateCslQueryProvider(connectionString);
 
                 _providers.TryAdd(authSettings.DatabaseName, provider);
