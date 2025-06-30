@@ -12,7 +12,7 @@ namespace AzureTools.Client.Model
         public string DisplayName { get; set; } = string.Empty;
         public string RoleTemplateId { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public List<string> Members { get; set; } = new List<string>();
+        public List<string> Members { get; set; } = [];
         public DateTime CreatedDateTime { get; set; }
     }
 }

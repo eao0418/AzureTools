@@ -1,0 +1,12 @@
+﻿{
+  "graphAuthenticationSettings": {
+    "audience": "https://graph.microsoft.com/"
+  },
+  "armAuthenticationSettings": {
+    "authenticationType": "ClientSecret",
+    "password": "",
+    "clientId": "",
+    "tenantId": "",
+    "audience": "https://management.azure.com/"
+  }
+}

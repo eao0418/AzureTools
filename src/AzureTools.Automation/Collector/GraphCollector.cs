@@ -11,39 +11,29 @@ namespace AzureTools.Automation.Collector
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using System;
-    using System.Linq;
     using System.Threading.Tasks;
 
-    public sealed class GraphCollector
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GraphCollector"/> class.
+    /// </summary>
+    /// <param name="graphClient">The client to interact with the graph api.</param>
+    /// <param name="objectRepository">How data is being written out.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="authSettingsOption">The authenticationsettings to use to auth to the graph api.</param>
+    /// <exception cref="ArgumentNullException">If a required argument is null.</exception>
+    public sealed class GraphCollector(
+        IGraphClient graphClient,
+        IObjectRepository objectRepository,
+        ILogger<GraphCollector> logger,
+        IOptions<AuthenticationSettings> authSettingsOption,
+        IMessageFactory messageFactory)
     {
-        private readonly IGraphClient _graphClient;
-        private readonly IObjectRepository _objectRepository;
-        private readonly ILogger<GraphCollector> _logger;
-        private readonly IMessageFactory _messageFactory;
+        private readonly IGraphClient _graphClient = graphClient ?? throw new ArgumentNullException(nameof(graphClient));
+        private readonly IObjectRepository _objectRepository = objectRepository ?? throw new ArgumentNullException(nameof(objectRepository));
+        private readonly ILogger<GraphCollector> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        private readonly IMessageFactory _messageFactory = messageFactory ?? throw new ArgumentNullException(nameof(messageFactory));
         // For this iteration, support only one authentication settings key. 
-        private readonly AuthenticationSettings _authSettings;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GraphCollector"/> class.
-        /// </summary>
-        /// <param name="graphClient">The client to interact with the graph api.</param>
-        /// <param name="objectRepository">How data is being written out.</param>
-        /// <param name="logger">The logger.</param>
-        /// <param name="authSettingsOption">The authenticationsettings to use to auth to the graph api.</param>
-        /// <exception cref="ArgumentNullException">If a required argument is null.</exception>
-        public GraphCollector(
-            IGraphClient graphClient,
-            IObjectRepository objectRepository,
-            ILogger<GraphCollector> logger,
-            IOptions<AuthenticationSettings> authSettingsOption,
-            IMessageFactory messageFactory)
-        {
-            _graphClient = graphClient ?? throw new ArgumentNullException(nameof(graphClient));
-            _objectRepository = objectRepository ?? throw new ArgumentNullException(nameof(objectRepository));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _authSettings = authSettingsOption?.Value ?? throw new ArgumentNullException(nameof(authSettingsOption));
-            _messageFactory = messageFactory ?? throw new ArgumentNullException(nameof(messageFactory));
-        }
+        private readonly AuthenticationSettings _authSettings = authSettingsOption?.Value ?? throw new ArgumentNullException(nameof(authSettingsOption));
 
         public async Task CollectUsersAsync(string executionId, CancellationToken stopToken = default)
         {
@@ -60,7 +50,7 @@ namespace AzureTools.Automation.Collector
             }
 
             await _objectRepository.WriteAsync(usersResponse.Value);
-            _logger.LogInformation("Successfully collected {Count} users for tenant {TenantId}", usersResponse.Value.Count(), tenantId);
+            _logger.LogInformation("Successfully collected {Count} users for tenant {TenantId}", usersResponse.Value.Count, tenantId);
 
             if (string.IsNullOrWhiteSpace(usersResponse?.ODataNextLink) is false)
             {
@@ -112,7 +102,7 @@ namespace AzureTools.Automation.Collector
             }
 
             await _objectRepository.WriteAsync(groupsResponse.Value);
-            _logger.LogInformation("Successfully collected {Count} groups for tenant {TenantId}", groupsResponse.Value.Count(), tenantId);
+            _logger.LogInformation("Successfully collected {Count} groups for tenant {TenantId}", groupsResponse.Value.Count, tenantId);
 
             if (string.IsNullOrWhiteSpace(groupsResponse?.ODataNextLink) is false)
             {
@@ -149,7 +139,7 @@ namespace AzureTools.Automation.Collector
             }
 
             await _objectRepository.WriteAsync(serviceprincipalresponse.Value);
-            _logger.LogInformation("Successfully collected {Count} serviceprincipals for tenant {TenantId}", serviceprincipalresponse.Value.Count(), tenantId);
+            _logger.LogInformation("Successfully collected {Count} serviceprincipals for tenant {TenantId}", serviceprincipalresponse.Value.Count, tenantId);
 
             if (string.IsNullOrWhiteSpace(serviceprincipalresponse?.ODataNextLink) is false)
             {
@@ -186,7 +176,7 @@ namespace AzureTools.Automation.Collector
             }
 
             await _objectRepository.WriteAsync(appRegistrationResponse.Value);
-            _logger.LogInformation("Successfully collected {Count} ApplicationRegistration for tenant {TenantId}", appRegistrationResponse.Value.Count(), tenantId);
+            _logger.LogInformation("Successfully collected {Count} ApplicationRegistration for tenant {TenantId}", appRegistrationResponse.Value.Count, tenantId);
 
             foreach (var app in appRegistrationResponse.Value)
             {
@@ -241,7 +231,7 @@ namespace AzureTools.Automation.Collector
 
             await _objectRepository.WriteAsync(result.Value);
 
-            _logger.LogInformation("Successfully collected {Count} owners for application registration {AppId} in tenant {TenantId}", result.Value.Count(), request.AppId, request.TenantId);
+            _logger.LogInformation("Successfully collected {Count} owners for application registration {AppId} in tenant {TenantId}", result.Value.Count, request.AppId, request.TenantId);
 
             if (string.IsNullOrWhiteSpace(result?.ODataNextLink) is false)
             {
@@ -282,7 +272,7 @@ namespace AzureTools.Automation.Collector
 
             await _objectRepository.WriteAsync(result.Value);
 
-            _logger.LogInformation("Successfully collected {Count} owners for application registration {AppId} in tenant {TenantId}", result.Value.Count(), request.AppId, request.TenantId);
+            _logger.LogInformation("Successfully collected {Count} owners for application registration {AppId} in tenant {TenantId}", result.Value.Count, request.AppId, request.TenantId);
 
             if (string.IsNullOrWhiteSpace(result?.ODataNextLink) is false)
             {
@@ -318,7 +308,7 @@ namespace AzureTools.Automation.Collector
             }
 
             await _objectRepository.WriteAsync(directoryRoleResponse.Value);
-            _logger.LogInformation("Successfully collected {Count} DirectoryRole for tenant {TenantId}", directoryRoleResponse.Value.Count(), tenantId);
+            _logger.LogInformation("Successfully collected {Count} DirectoryRole for tenant {TenantId}", directoryRoleResponse.Value.Count, tenantId);
 
             if (string.IsNullOrWhiteSpace(directoryRoleResponse?.ODataNextLink) is false)
             {
@@ -360,7 +350,7 @@ namespace AzureTools.Automation.Collector
 
             await _objectRepository.WriteAsync(result.Value);
 
-            _logger.LogInformation("Successfully collected {Count} members for group {GroupId} in tenant {TenantId}", result.Value.Count(), request.GroupId, request.TenantId);
+            _logger.LogInformation("Successfully collected {Count} members for group {GroupId} in tenant {TenantId}", result.Value.Count, request.GroupId, request.TenantId);
 
             if (string.IsNullOrWhiteSpace(result?.ODataNextLink) is false)
             {

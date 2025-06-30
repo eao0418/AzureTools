@@ -18,7 +18,7 @@ namespace AzureTools.Client.Model
         public string Id { get; set; } = string.Empty;
         public string Issuer { get; set; } = string.Empty;
         public string Subject { get; set; } = string.Empty;
-        public List<string> Audiences { get; set; } = new List<string>();
+        public List<string> Audiences { get; set; } = [];
     }
 
     public record SignInActivity

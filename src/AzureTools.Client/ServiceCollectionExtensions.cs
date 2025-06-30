@@ -28,65 +28,65 @@
                 //
                 if (s.UserProperties.Count == 0)
                 {
-                    s.UsersEndpoint = Endpoints.UsersEndpoint;
+                    s.UsersEndpoint = GraphEndpoints.UsersEndpoint;
                 }
                 else
                 {
-                    s.UsersEndpoint = $"{Endpoints.UsersEndpointBase}{string.Join(",", s.UserProperties)}";
+                    s.UsersEndpoint = $"{GraphEndpoints.UsersEndpointBase}{string.Join(",", s.UserProperties)}";
                 }
                 
                 if (s.GroupProperties.Count == 0)
                 {
-                    s.GroupsEndpoint = Endpoints.GroupsEndpoint;
+                    s.GroupsEndpoint = GraphEndpoints.GroupsEndpoint;
                 }
                 else
                 {
-                    s.GroupsEndpoint = $"{Endpoints.GroupsEndpointBase}{string.Join(",", s.GroupProperties)}";
+                    s.GroupsEndpoint = $"{GraphEndpoints.GroupsEndpointBase}{string.Join(",", s.GroupProperties)}";
                 }
                 
                 if (s.ApplicationRegistrationProperties.Count == 0)
                 {
-                    s.ApplicationRegistrationEndpoint = Endpoints.ApplicationRegistrationEndpoint;
+                    s.ApplicationRegistrationEndpoint = GraphEndpoints.ApplicationRegistrationEndpoint;
                 }
                 else
                 {
-                    s.ApplicationRegistrationEndpoint = $"{Endpoints.ApplicationsEndpointBase}{string.Join(",", s.ApplicationRegistrationProperties)}";
+                    s.ApplicationRegistrationEndpoint = $"{GraphEndpoints.ApplicationsEndpointBase}{string.Join(",", s.ApplicationRegistrationProperties)}";
                 }
                 
                 if (s.ApplicationOwnerProperties.Count == 0)
                 {
-                    s.ApplicationOwnersEndpoint = Endpoints.ApplicationOwnersEndpoint;
+                    s.ApplicationOwnersEndpoint = GraphEndpoints.ApplicationOwnersEndpoint;
                 }
                 else
                 {
-                    s.ApplicationOwnersEndpoint = $"{Endpoints.ApplicationOwnersEndpointBase}{string.Join(",", s.ApplicationOwnerProperties)}";
+                    s.ApplicationOwnersEndpoint = $"{GraphEndpoints.ApplicationOwnersEndpointBase}{string.Join(",", s.ApplicationOwnerProperties)}";
                 }
 
                 if (s.GroupMemberProperties.Count == 0)
                 {
-                    s.GroupMembersEndpoint = Endpoints.GroupMembersEndpoint;
+                    s.GroupMembersEndpoint = GraphEndpoints.GroupMembersEndpoint;
                 }
                 else
                 {
-                    s.GroupMembersEndpoint = $"{Endpoints.GroupMembersEndpointBase}{string.Join(",", s.GroupMemberProperties)}";
+                    s.GroupMembersEndpoint = $"{GraphEndpoints.GroupMembersEndpointBase}{string.Join(",", s.GroupMemberProperties)}";
                 }
 
                 if (s.ServicePrincipalProperties.Count == 0)
                 {
-                    s.ServicePrincipalsEndpoint = Endpoints.ServicePrincipalsEndpoint;
+                    s.ServicePrincipalsEndpoint = GraphEndpoints.ServicePrincipalsEndpoint;
                 }
                 else
                 {
-                    s.ServicePrincipalsEndpoint = $"{Endpoints.ServicePrincipalsEndpointBase}{string.Join(",", s.ServicePrincipalProperties)}";
+                    s.ServicePrincipalsEndpoint = $"{GraphEndpoints.ServicePrincipalsEndpointBase}{string.Join(",", s.ServicePrincipalProperties)}";
                 }
 
                 if (s.DirectoryRoleProperties.Count == 0)
                 {
-                    s.DirectoryRolesEndpoint = Endpoints.DirectoryRolesEndpoint;
+                    s.DirectoryRolesEndpoint = GraphEndpoints.DirectoryRolesEndpoint;
                 }
                 else
                 {
-                    s.DirectoryRolesEndpoint = $"{Endpoints.DirectoryRolesEndpointBase}{string.Join(",", s.DirectoryRoleProperties)}";
+                    s.DirectoryRolesEndpoint = $"{GraphEndpoints.DirectoryRolesEndpointBase}{string.Join(",", s.DirectoryRoleProperties)}";
                 }
 
             });

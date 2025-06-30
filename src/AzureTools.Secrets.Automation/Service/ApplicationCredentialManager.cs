@@ -37,7 +37,7 @@
         public async Task CheckForPasswordsReadyToExpire(CancellationToken stopToken)
         {
             var path = System.IO.Path.Combine(AppContext.BaseDirectory, "queries", "GetExpiringPasswords.kql");
-            var query = await File.ReadAllTextAsync(path);
+            var query = await File.ReadAllTextAsync(path, stopToken);
 
             if (string.IsNullOrEmpty(query))
             {
@@ -46,7 +46,7 @@
 
             var results = await _kustoReader.ExecuteQueryAsync<ExpiringApplicationPassword>(_settings.DataSourceName, query, stopToken);
 
-            if ( results == null || results.Count() == 0)
+            if ( results == null || results.Any() is false)
             {
                 _logger.LogInformation("No expiring passwords found.");
                 return;
@@ -87,7 +87,7 @@
             };
 
 #pragma warning disable CS8604 // Possible null reference argument. This is checked in the ctor. insert eye roll here for the warning VS.
-            var response = await _graphClient.AddApplicationPasswordAsync(applicationId, updateRequest, _settings.AuthenticationSettings, stopToken);
+             await _graphClient.AddApplicationPasswordAsync(applicationId, updateRequest, _settings.AuthenticationSettings, stopToken);
 #pragma warning restore CS8604 // Possible null reference argument.
 
             // To-Do write the result to a secret handler

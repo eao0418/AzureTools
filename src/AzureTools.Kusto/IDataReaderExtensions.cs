@@ -1,4 +1,7 @@
-﻿namespace AzureTools.Kusto
+﻿// IDataReaderExtensions.cs Copyright (c) Aaron Randolph. All rights reserved.
+// Licensed under the MIT license. See License.txt in the project root for license information.
+
+namespace AzureTools.Kusto
 {
     using System;
     using System.Collections.Generic;
@@ -8,10 +11,7 @@
     {
         public static IEnumerable<T> ToEnumerable<T>(this IDataReader reader) where T: class, new()
         {
-            if (reader == null)
-            {
-                throw new ArgumentNullException(nameof(reader));
-            }
+            ArgumentNullException.ThrowIfNull(reader);
             var properties = typeof(T).GetProperties();
             var result = new List<T>();
 

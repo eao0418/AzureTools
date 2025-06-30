@@ -49,9 +49,9 @@ namespace AzureTools.Client
                 executionId = Guid.NewGuid().ToString();
             }
 
-            _logger.LogInformation("Getting users from Graph API with execution ID: {ExecutionId} with endpoint {e}", executionId, Endpoints.UsersEndpoint);
+            _logger.LogInformation("Getting users from Graph API with execution ID: {ExecutionId} with endpoint {e}", executionId, GraphEndpoints.UsersEndpoint);
 
-            return await GetGraphObjectsAsync<User>(settings, Endpoints.UsersEndpoint, executionId, stopToken);
+            return await GetGraphObjectsAsync<User>(settings, GraphEndpoints.UsersEndpoint, executionId, stopToken);
         }
 
         public async Task<ODataResponse<Group>?> GetGroupsAsync(AuthenticationSettings settings, string? executionId = default, CancellationToken stopToken = default)
@@ -61,7 +61,7 @@ namespace AzureTools.Client
                 executionId = Guid.NewGuid().ToString();
             }
 
-            return await GetGraphObjectsAsync<Group>(settings, Endpoints.GroupsEndpoint, executionId, stopToken);
+            return await GetGraphObjectsAsync<Group>(settings, GraphEndpoints.GroupsEndpoint, executionId, stopToken);
         }
 
         public async Task<ODataResponse<ServicePrincipal>?> GetServicePrincipalsAsync(AuthenticationSettings settings, string? executionId = default, CancellationToken stopToken = default)
@@ -71,7 +71,7 @@ namespace AzureTools.Client
                 executionId = Guid.NewGuid().ToString();
             }
 
-            return await GetGraphObjectsAsync<ServicePrincipal>(settings, Endpoints.ServicePrincipalsEndpoint, executionId, stopToken);
+            return await GetGraphObjectsAsync<ServicePrincipal>(settings, GraphEndpoints.ServicePrincipalsEndpoint, executionId, stopToken);
         }
 
         public async Task<ODataResponse<ApplicationRegistration>?> GetApplicationRegistrationsAsync(AuthenticationSettings settings, string? executionId = default, CancellationToken stopToken = default)
@@ -81,7 +81,7 @@ namespace AzureTools.Client
                 executionId = Guid.NewGuid().ToString();
             }
 
-            return await GetGraphObjectsAsync<ApplicationRegistration>(settings, Endpoints.ApplicationRegistrationEndpoint, executionId, stopToken);
+            return await GetGraphObjectsAsync<ApplicationRegistration>(settings, GraphEndpoints.ApplicationRegistrationEndpoint, executionId, stopToken);
         }
 
         public async Task<ODataResponse<GroupMember>?> GetGroupMembershipAsync(string authSettingsKey, string tenantId, string groupId, string? executionId = default, CancellationToken stopToken = default)
@@ -91,7 +91,7 @@ namespace AzureTools.Client
                 executionId = Guid.NewGuid().ToString();
             }
 
-            var groupMembersEndpoint = Endpoints.GroupMembersEndpoint.Replace("{groupId}", groupId);
+            var groupMembersEndpoint = GraphEndpoints.GroupMembersEndpoint.Replace("{groupId}", groupId);
 
             var objectResponse = await GetODataResponseAsync<GroupMember>(groupMembersEndpoint, authSettingsKey, stopToken);
 
@@ -146,7 +146,7 @@ namespace AzureTools.Client
                 executionId = Guid.NewGuid().ToString();
             }
 
-            var appOwnerEndpoint = Endpoints.ApplicationOwnersEndpoint.Replace("{applicationId}", appId);
+            var appOwnerEndpoint = GraphEndpoints.ApplicationOwnersEndpoint.Replace("{applicationId}", appId);
 
             var objectResponse = await GetODataResponseAsync<ApplicationOwner>(appOwnerEndpoint, authSettingsKey, stopToken);
 
@@ -196,7 +196,7 @@ namespace AzureTools.Client
                 executionId = Guid.NewGuid().ToString();
             }
 
-            var roles = await GetGraphObjectsAsync<DirectoryRole>(settings, Endpoints.DirectoryRolesEndpoint, executionId, stopToken);
+            var roles = await GetGraphObjectsAsync<DirectoryRole>(settings, GraphEndpoints.DirectoryRolesEndpoint, executionId, stopToken);
 
             if (roles == null || roles.Value == null)
             {

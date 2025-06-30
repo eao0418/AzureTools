@@ -12,7 +12,7 @@ namespace AzureTools.Client.Model
         public string DisplayName { get; set; } = string.Empty;
         public bool SecurityEnabled { get; set; }
         public string IsAssignableToRole { get; set; } = string.Empty;
-        public List<string> GroupTypes { get; set; } = new List<string>();
+        public List<string> GroupTypes { get; set; } = [];
         public string Visibility { get; set; } = string.Empty;
         public bool MailEnabled { get; set; }
         public string MembershipRule { get; set; } = string.Empty;
@@ -22,7 +22,7 @@ namespace AzureTools.Client.Model
         public bool? OnPremisesSyncEnabled { get; set; }
         public DateTime CreatedDateTime { get; set; }
         public DateTime RenewedDateTime { get; set; }
-        public List<string> ResourceBehaviorOptions { get; set; } = new List<string>();
+        public List<string> ResourceBehaviorOptions { get; set; } = [];
         public string PreferredDataLocation { get; set; } = string.Empty;
         public string OnPremisesDomainName { get; set; } = string.Empty;
         public DateTime? OnPremisesLastSyncDateTime { get; set; }

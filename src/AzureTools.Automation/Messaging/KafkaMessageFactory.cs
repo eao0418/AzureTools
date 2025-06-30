@@ -8,7 +8,7 @@ namespace AzureTools.Automation.Messaging
 
     public sealed class KafkaMessageFactory : IDisposable, IMessageFactory
     {
-        private ConcurrentDictionary<string, IProducer<string, string>> _producers = new();
+        private readonly ConcurrentDictionary<string, IProducer<string, string>> _producers = new();
 
         public KafkaMessageFactory()
         {

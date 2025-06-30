@@ -12,7 +12,7 @@ namespace AzureTools.Client.Model
         public string DisplayName { get; set; } = string.Empty;
         public string AppId { get; set; } = string.Empty;
         public string ServicePrincipalType { get; set; } = string.Empty;
-        public List<object> AppRoles { get; set; } = new ();
+        public List<object> AppRoles { get; set; } = [];
         public bool AccountEnabled { get; set; }
         public bool IsAssignRoleRestricted { get; set; }
         [System.Text.Json.Serialization.JsonPropertyName("appRoleAssignmentRequired")]

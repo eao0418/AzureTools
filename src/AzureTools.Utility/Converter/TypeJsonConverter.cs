@@ -29,13 +29,7 @@ namespace AzureTools.Utility.Converter
                 throw new FormatException("value could not be converted.");
             }
 
-            var convertedType = Type.GetType(typeFullName);
-
-            if (convertedType == null)
-            {
-                throw new InvalidOperationException($"Type '{typeFullName}' could not be converted.");
-            }
-
+            Type? convertedType = Type.GetType(typeFullName) ?? throw new InvalidOperationException($"Type '{typeFullName}' could not be converted.");
             return convertedType;
         }
 

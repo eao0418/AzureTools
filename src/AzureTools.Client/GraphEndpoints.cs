@@ -6,7 +6,7 @@ namespace AzureTools.Client
     /// <summary>
     /// Defines endpoints for Microsoft Graph API interactions.
     /// </summary>
-    public static class Endpoints
+    public static class GraphEndpoints
     {
         private const string BetaVersion = "beta";
         private const string Version = "v1.0";
@@ -14,7 +14,7 @@ namespace AzureTools.Client
         /// <summary>
         /// Base endpoint for Microsoft Graph API users.
         /// </summary>
-        public static string UsersEndpointBase = $"/{BetaVersion}/users?$select=";
+        public static string UsersEndpointBase => $"/{BetaVersion}/users?$select=";
 
         /// <summary>
         /// Endpoint for Microsoft Graph API users with specific fields selected.

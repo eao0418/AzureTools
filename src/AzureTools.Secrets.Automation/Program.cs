@@ -1,5 +1,5 @@
 using AzureTools.Client;
-using AzureTools.Repository;
+using AzureTools.Kusto;
 using AzureTools.Secrets.Automation;
 using AzureTools.Secrets.Automation.Service;
 using Microsoft.Azure.Functions.Worker.Builder;

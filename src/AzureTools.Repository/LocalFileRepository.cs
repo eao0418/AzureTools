@@ -4,7 +4,7 @@
 namespace AzureTools.Repository
 {
     using AzureTools.Repository.Model;
-    using System.Text.Json;
+    using AzureTools.Utility;
 
     /// <summary>
     /// Object repository implementation that writes to a local file.
@@ -30,13 +30,7 @@ namespace AzureTools.Repository
             var fileName = $"{executionId}-{typeName}-{timeStamp}.json";
             var filePath = Path.Combine(Environment.CurrentDirectory, fileName);
 
-            var json = JsonSerializer.Serialize(
-                items,
-                new JsonSerializerOptions
-                {
-                    WriteIndented = true,
-                    DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
-                });
+            var json = JsonUtil.Serialize(items);
 
             using (var writer = new StreamWriter(filePath))
             {
