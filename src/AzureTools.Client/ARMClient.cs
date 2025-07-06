@@ -15,6 +15,8 @@ namespace AzureTools.Client
     using System.Threading;
     using AzureTools.Client.Model.Resources;
     using System.Collections.Generic;
+    using System.Collections.Concurrent;
+    using System.Text.RegularExpressions;
 
     public class ARMClient
     {
@@ -22,6 +24,7 @@ namespace AzureTools.Client
         private readonly ITokenCache _tokenCache;
         private readonly HttpClient _httpClient;
         private readonly JsonSerializerOptions _jsonSerializerOptions;
+        private readonly ConcurrentDictionary<string, List<string>> _resourceApiVersion = new();
 
         public ARMClient(
             ITokenCache tokenCache,
@@ -125,7 +128,31 @@ namespace AzureTools.Client
                 executionId = Guid.NewGuid().ToString();
             }
 
-            var endpoint = $"{resourceId}{ARMEndpoints.ResourcesApiVersionParameter}";
+            var match = Regex.Match(resourceId, @"providers/([^/]+)/");
+            string provider;
+            if (match.Success)
+            {
+                provider = match.Groups[1].Value;
+            }
+            else
+            {
+                throw new Exception("Provider was not extracted from the resource id");
+            }
+
+            var subMatch = Regex.Match(resourceId, @"/subscriptions/([a-fA-F0-9\-]{36})");
+            string subscriptionId;
+            if (match.Success)
+            {
+                subscriptionId = match.Groups[1].Value;
+                Console.WriteLine(subscriptionId);  // Output: 12345678-1234-1234-1234-123456789012
+            }
+            else {
+                throw new Exception("Not able to extract the subscription id from the resource id");
+            }
+
+            var version = GetApiVersionAsync(settings, subscriptionId, provider, executionId, stopToken);
+
+            var endpoint = $"{resourceId}?api-version={version}";
 
             _logger.LogInformation("Getting resource properties from the ARM API with execution ID: {ExecutionId} from resource {s}", executionId, endpoint);
 
@@ -192,6 +219,32 @@ namespace AzureTools.Client
             };
 
             return response;
+        }
+
+        public async Task<Provider?> GetProviderApiVersionAsync(AuthenticationSettings settings, string subscriptionId, string resourceProvider, string? executionId = default, CancellationToken stopToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(subscriptionId))
+            {
+                throw new ArgumentException("subscriptionId cannot be null or empty.", nameof(subscriptionId));
+            }
+            if (string.IsNullOrWhiteSpace(executionId))
+            {
+                executionId = Guid.NewGuid().ToString();
+            }
+
+            var endpoint = ARMEndpoints.ListApiVersionForResourceProvider.Replace("{subscriptionId}", subscriptionId).Replace("{resourceProviderNamespace}", resourceProvider);
+
+            _logger.LogInformation("Getting resource properties from the ARM API with execution ID: {ExecutionId} from resource {s}", executionId, endpoint);
+
+            var provider = await GetARMResponseAsync<Provider>(endpoint, settings, stopToken);
+
+            if (provider != null)
+            {
+                provider.ExecutionId = executionId;
+                provider.TenantId = settings.TenantId;
+            }
+
+            return provider;
         }
 
         /// <summary>
@@ -299,9 +352,7 @@ namespace AzureTools.Client
                     throw new HttpRequestException($"Request to {url} failed with status code {httpResponse.StatusCode}");
                 }
 
-                _logger.LogInformation($"status code: {httpResponse.StatusCode}");
-                content = await httpResponse.Content.ReadAsStringAsync(stopToken);
-                _logger.LogInformation("Response content: {Content}", content);
+                _logger.LogDebug($"status code: {httpResponse.StatusCode}");
 
                 response = await httpResponse.Content.ReadFromJsonAsync<T>(_jsonSerializerOptions, stopToken)
                            ?? throw new InvalidOperationException("Failed to deserialize OData response.");
@@ -343,6 +394,79 @@ namespace AzureTools.Client
             }
 
             return response;
+        }
+
+        private async Task RefreshResourceTypeApiVersionCache(
+            AuthenticationSettings settings,
+            string subscriptionId,
+            string resourceProvider,
+            string? executionId = default,
+            CancellationToken stopToken = default)
+        {
+            var resource = await GetProviderApiVersionAsync(settings, subscriptionId, resourceProvider, executionId, stopToken);
+
+            if (resource == null || resource.ResourceTypes == null)
+            {
+                _logger.LogWarning("No resource types found for provider {ResourceProvider} in subscription {SubscriptionId}", resourceProvider, subscriptionId);
+                return;
+            }
+
+            _logger.LogInformation("Refreshing resource type API version cache for provider {ResourceProvider} in subscription {SubscriptionId}", resourceProvider, subscriptionId);
+
+            foreach (var resourceType in resource.ResourceTypes)
+            {
+                if (resourceType.ApiVersions == null || resourceType.ApiVersions.Count == 0)
+                {
+                    _logger.LogWarning("No API versions found for resource type {ResourceType} in provider {ResourceProvider}", resourceType.ResourceType, resourceProvider);
+                    continue;
+                }
+
+                if (string.IsNullOrWhiteSpace(resourceType.ResourceType))
+                {
+                    continue;
+                }
+
+                if (_resourceApiVersion.ContainsKey(resourceType.ResourceType) is false)
+                {
+                    _resourceApiVersion[resourceType.ResourceType] = resourceType.ApiVersions;
+                }
+            }
+        }
+
+        private async Task<string> GetApiVersionAsync(
+            AuthenticationSettings settings,
+            string subscriptionId,
+            string resourceProvider,
+            string? executionId = default,
+            CancellationToken stopToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(subscriptionId))
+            {
+                throw new ArgumentException("Subscription ID cannot be null or empty.", nameof(subscriptionId));
+            }
+            if (string.IsNullOrWhiteSpace(resourceProvider))
+            {
+                throw new ArgumentException("Resource provider cannot be null or empty.", nameof(resourceProvider));
+            }
+            if (string.IsNullOrWhiteSpace(executionId))
+            {
+                executionId = Guid.NewGuid().ToString();
+            }
+            if (_resourceApiVersion.TryGetValue(resourceProvider, out var apiVersions) && apiVersions.Count > 0)
+            {
+                _logger.LogDebug("Using cached API version for resource provider {ResourceProvider}: {ApiVersion}", resourceProvider, apiVersions[0]);
+                return apiVersions[0];
+            }
+            await RefreshResourceTypeApiVersionCache(settings, subscriptionId, resourceProvider, executionId, stopToken);
+            
+            if (_resourceApiVersion.TryGetValue(resourceProvider, out apiVersions) && apiVersions.Count > 0)
+            {
+                _logger.LogDebug("Using refreshed API version for resource provider {ResourceProvider}: {ApiVersion}", resourceProvider, apiVersions[0]);
+                return apiVersions[0];
+            }
+
+            _logger.LogWarning("No API versions found for resource provider {ResourceProvider} in subscription {SubscriptionId}", resourceProvider, subscriptionId);
+            return string.Empty;
         }
     }
 }

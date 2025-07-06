@@ -85,6 +85,37 @@ namespace AzureTools.Cli
             return 0;
         }
 
+        public static async Task<int> GetApiVersionForResourceAsync(IHost host, string armAuthSettingsKey, string subscriptionId, string resourceProvider, CancellationToken stopToken)
+        {
+            var optionsMonitor = host.Services.GetRequiredService<IOptionsMonitor<AuthenticationSettings>>();
+            var armSettings = optionsMonitor.Get(armAuthSettingsKey);
+            Console.WriteLine($"Settings: {armSettings.Audience}, {armSettings.AuthenticationType}");
+            var armClient = host.Services.GetRequiredService<ARMClient>();
+            var result = await armClient.GetProviderApiVersionAsync(armSettings, subscriptionId, resourceProvider, Guid.NewGuid().ToString(), stopToken: stopToken);
+
+            if (result != null)
+            {
+                Console.WriteLine($"API versions for resource provider '{resourceProvider}':");
+
+                if (result.ResourceTypes == null || !result.ResourceTypes.Any())
+                {
+                    Console.WriteLine($"No resource types found for resource provider '{resourceProvider}'.");
+                    return 1;
+                }
+                foreach (var resource in result.ResourceTypes)
+                {
+                    Console.WriteLine($"{resource.ResourceType} default API version is {resource.DefaultApiVersion}");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"No API versions found for resource provider '{resourceProvider}'.");
+                return 1;
+            }
+
+            return 0;
+        }
+
         public static async Task<int> GetResourcePropertiesAsync(IHost host, string armAuthSettingsKey, string resourceId, CancellationToken stopToken)
         {
             var optionsMonitor = host.Services.GetRequiredService<IOptionsMonitor<AuthenticationSettings>>();

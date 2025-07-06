@@ -30,6 +30,13 @@ namespace AzureTools.Cli
                 Aliases = { "-s" }
             };
 
+            var resourceProviderOption = new Option<string>("--resource-provider")
+            {
+                Description = "The resource provider to use for the command.",
+                Required = false,
+                Aliases = { "-rp" }
+            };
+
             var resourceIdOption = new Option<string>("--resourceid")
             {
                 Description = "The resource ID to use for the command.",
@@ -77,6 +84,17 @@ namespace AzureTools.Cli
             });
             listResourcesCommand.Add(subscriptionidOption);
             listCommand.Add(listResourcesCommand);
+
+            var listResourceVersionsCommand = new Command("resource-versions", "List all versions for a provider in a subscription");
+            listResourceVersionsCommand.SetAction((ParseResult parseResult, CancellationToken stopToken) =>
+            {
+                string? subscriptionId = parseResult.GetValue<string>("--subscriptionid") ?? string.Empty;
+                string? resourceProvider = parseResult.GetValue<string>("--resource-provider") ?? string.Empty;
+                return ARMClientAccessor.GetApiVersionForResourceAsync(host, ARMAuthSettingsKey, subscriptionId, resourceProvider, stopToken);
+            });
+            listResourceVersionsCommand.Add(subscriptionidOption);
+            listResourceVersionsCommand.Add(resourceProviderOption);
+            listCommand.Add(listResourceVersionsCommand);
 
             var listResourcePropertiesCommand = new Command("resource-properties", "List properties of a specific resource");
             listResourcePropertiesCommand.SetAction((ParseResult ParseResult, CancellationToken stopToken) =>

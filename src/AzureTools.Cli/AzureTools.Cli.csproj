@@ -8,7 +8,6 @@
     <PublishAot>true</PublishAot>
     <InvariantGlobalization>true</InvariantGlobalization>
     <AssemblyName>AzureTools.Cli</AssemblyName>
-    <OutputType>exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
