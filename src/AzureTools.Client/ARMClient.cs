@@ -17,6 +17,7 @@ namespace AzureTools.Client
     using System.Collections.Generic;
     using System.Collections.Concurrent;
     using System.Text.RegularExpressions;
+    using Azure.Core;
 
     public class ARMClient
     {
@@ -128,29 +129,7 @@ namespace AzureTools.Client
                 executionId = Guid.NewGuid().ToString();
             }
 
-            var match = Regex.Match(resourceId, @"providers/([^/]+)/");
-            string provider;
-            if (match.Success)
-            {
-                provider = match.Groups[1].Value;
-            }
-            else
-            {
-                throw new Exception("Provider was not extracted from the resource id");
-            }
-
-            var subMatch = Regex.Match(resourceId, @"/subscriptions/([a-fA-F0-9\-]{36})");
-            string subscriptionId;
-            if (match.Success)
-            {
-                subscriptionId = match.Groups[1].Value;
-                Console.WriteLine(subscriptionId);  // Output: 12345678-1234-1234-1234-123456789012
-            }
-            else {
-                throw new Exception("Not able to extract the subscription id from the resource id");
-            }
-
-            var version = GetApiVersionAsync(settings, subscriptionId, provider, executionId, stopToken);
+            var version = await GetApiVersionAsync(settings, resourceId, executionId, stopToken);
 
             var endpoint = $"{resourceId}?api-version={version}";
 
@@ -426,46 +405,49 @@ namespace AzureTools.Client
                     continue;
                 }
 
-                if (_resourceApiVersion.ContainsKey(resourceType.ResourceType) is false)
+                var key = $"{resourceProvider}/{resourceType.ResourceType}";
+
+                if (_resourceApiVersion.ContainsKey(key) is false)
                 {
-                    _resourceApiVersion[resourceType.ResourceType] = resourceType.ApiVersions;
+                    _resourceApiVersion[key] = resourceType.ApiVersions;
                 }
             }
         }
 
         private async Task<string> GetApiVersionAsync(
             AuthenticationSettings settings,
-            string subscriptionId,
-            string resourceProvider,
+            string resourceId,
             string? executionId = default,
             CancellationToken stopToken = default)
         {
-            if (string.IsNullOrWhiteSpace(subscriptionId))
+            if (string.IsNullOrWhiteSpace(resourceId))
             {
-                throw new ArgumentException("Subscription ID cannot be null or empty.", nameof(subscriptionId));
-            }
-            if (string.IsNullOrWhiteSpace(resourceProvider))
-            {
-                throw new ArgumentException("Resource provider cannot be null or empty.", nameof(resourceProvider));
+                throw new ArgumentException("Resource id cannot be null or empty.", nameof(resourceId));
             }
             if (string.IsNullOrWhiteSpace(executionId))
             {
                 executionId = Guid.NewGuid().ToString();
             }
-            if (_resourceApiVersion.TryGetValue(resourceProvider, out var apiVersions) && apiVersions.Count > 0)
+
+            var rId = new ResourceIdentifier(resourceId);
+
+            if (_resourceApiVersion.TryGetValue(rId.ResourceType, out var apiVersions) && apiVersions.Count > 0)
             {
-                _logger.LogDebug("Using cached API version for resource provider {ResourceProvider}: {ApiVersion}", resourceProvider, apiVersions[0]);
-                return apiVersions[0];
-            }
-            await RefreshResourceTypeApiVersionCache(settings, subscriptionId, resourceProvider, executionId, stopToken);
-            
-            if (_resourceApiVersion.TryGetValue(resourceProvider, out apiVersions) && apiVersions.Count > 0)
-            {
-                _logger.LogDebug("Using refreshed API version for resource provider {ResourceProvider}: {ApiVersion}", resourceProvider, apiVersions[0]);
+                _logger.LogDebug("Using cached API version for resource provider {ResourceProvider}: {ApiVersion}", rId.ResourceType, apiVersions[0]);
                 return apiVersions[0];
             }
 
-            _logger.LogWarning("No API versions found for resource provider {ResourceProvider} in subscription {SubscriptionId}", resourceProvider, subscriptionId);
+            var id = rId.SubscriptionId ?? throw new ArgumentException("Subscription ID cannot be null or empty.", nameof(rId.SubscriptionId));
+
+            await RefreshResourceTypeApiVersionCache(settings, id, rId.ResourceType, executionId, stopToken);
+            
+            if (_resourceApiVersion.TryGetValue(rId.ResourceType, out apiVersions) && apiVersions.Count > 0)
+            {
+                _logger.LogDebug("Using refreshed API version for resource provider {ResourceProvider}: {ApiVersion}", rId.ResourceType, apiVersions[0]);
+                return apiVersions[0];
+            }
+
+            _logger.LogWarning("No API versions found for resource provider {ResourceProvider} in subscription {SubscriptionId}", rId.ResourceType, id);
             return string.Empty;
         }
     }

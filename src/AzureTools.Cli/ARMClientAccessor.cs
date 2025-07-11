@@ -9,9 +9,7 @@ namespace AzureTools.Cli
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Options;
     using System;
-    using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
     using System.Threading.Tasks;
 
     public static class ARMClientAccessor
@@ -85,11 +83,16 @@ namespace AzureTools.Cli
             return 0;
         }
 
-        public static async Task<int> GetApiVersionForResourceAsync(IHost host, string armAuthSettingsKey, string subscriptionId, string resourceProvider, CancellationToken stopToken)
+        public static async Task<int> GetApiVersionForResourceAsync(
+            IHost host,
+            string armAuthSettingsKey,
+            string subscriptionId,
+            string resourceProvider,
+            CancellationToken stopToken)
         {
             var optionsMonitor = host.Services.GetRequiredService<IOptionsMonitor<AuthenticationSettings>>();
             var armSettings = optionsMonitor.Get(armAuthSettingsKey);
-            Console.WriteLine($"Settings: {armSettings.Audience}, {armSettings.AuthenticationType}");
+            Console.WriteLine($"Executing {nameof(GetApiVersionForResourceAsync)} with subscription: {subscriptionId} with provider: {resourceProvider}");
             var armClient = host.Services.GetRequiredService<ARMClient>();
             var result = await armClient.GetProviderApiVersionAsync(armSettings, subscriptionId, resourceProvider, Guid.NewGuid().ToString(), stopToken: stopToken);
 
@@ -120,7 +123,7 @@ namespace AzureTools.Cli
         {
             var optionsMonitor = host.Services.GetRequiredService<IOptionsMonitor<AuthenticationSettings>>();
             var armSettings = optionsMonitor.Get(armAuthSettingsKey);
-            Console.WriteLine($"Settings: {armSettings.Audience}, {armSettings.AuthenticationType}");
+            Console.WriteLine($"Executing {nameof(GetResourcePropertiesAsync)} with resource: {resourceId}");
             var armClient = host.Services.GetRequiredService<ARMClient>();
             var resources = await armClient.GetResourcePropertiesAsync(armSettings, resourceId, stopToken: stopToken);
             if (resources == null || !resources.Value.Any())
