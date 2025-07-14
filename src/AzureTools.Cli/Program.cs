@@ -58,6 +58,7 @@ namespace AzureTools.Cli
                     services.AddHttpClient();
                     services.AddSingleton<ARMClient>();
                     services.AddSingleton<IGraphClient, GraphClient>();
+                    services.AddLogging();
                 })
                 .Build();
 

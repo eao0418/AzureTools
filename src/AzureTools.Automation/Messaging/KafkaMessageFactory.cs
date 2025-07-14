@@ -52,6 +52,28 @@ namespace AzureTools.Automation.Messaging
                 }).Build();
 
             _producers.TryAdd(MessageTopics.ApplicationRegistrationOwnersTopic, appOwnerProducer);
+
+            var resourcePropertiesProducer = new ProducerBuilder<string, string>(
+                new ProducerConfig
+                {
+                    BootstrapServers = bootstrapServers,
+                    SecurityProtocol = SecurityProtocol.Plaintext,
+                    SaslUsername = "",
+                    SaslPassword = ""
+                }).Build();
+
+            _producers.TryAdd(MessageTopics.ResourcePropertiesTopic, resourcePropertiesProducer);
+
+            var subscriptionProducer = new ProducerBuilder<string, string>(
+                new ProducerConfig
+                {
+                    BootstrapServers = bootstrapServers,
+                    SecurityProtocol = SecurityProtocol.Plaintext,
+                    SaslUsername = "",
+                    SaslPassword = ""
+                }).Build();
+
+            _producers.TryAdd(MessageTopics.SubscriptionEnumerationTopic, subscriptionProducer);
         }
 
         public void Dispose()
