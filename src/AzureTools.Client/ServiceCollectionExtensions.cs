@@ -90,13 +90,25 @@
                 }
 
             });
-            services.Configure<AuthenticationSettings>(config.GetSection(AuthenticationSettings.ConfigurationSectionName));
+            services.Configure<AuthenticationSettings>("graphAuthenticationSettings", config.GetSection("graphAuthenticationSettings"));
             services.AddHttpClient<GraphClient>(client =>
             {
                 client.BaseAddress = new Uri("https://graph.microsoft.com");
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             });
             services.AddSingleton<IGraphClient, GraphClient>();
+            services.AddAuthenticationServices();
+            return services;
+        }
+
+        public static IServiceCollection AddARMClient(this IServiceCollection services, IConfiguration config)
+        {
+            services.Configure<AuthenticationSettings>("armAuthenticationSettings", config.GetSection("armAuthenticationSettings"));
+            services.AddHttpClient<ARMClient>(client =>
+            {
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
+            services.AddSingleton<IARMClient, ARMClient>();
             services.AddAuthenticationServices();
             return services;
         }

@@ -25,7 +25,9 @@ namespace AzureTools
 			.ConfigureServices((context, service) =>
 			{
                 service.AddGraphClient(context.Configuration);
+                service.AddARMClient(context.Configuration);
                 service.AddSingleton<GraphCollector>();
+                service.AddSingleton<ARMCollector>();
                 service.AddKustoRepository(context.Configuration);
                 service.AddSingleton<IMessageFactory, KafkaMessageFactory>();
                 service.AddLogging();

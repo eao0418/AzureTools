@@ -7,6 +7,7 @@ namespace AzureTools.Client
     {
         private const string ResourceManagementVersion = "2022-12-01";
         private const string ResourcesVersion = "2025-04-01";
+        private const string GetResourceAPIVersion = "2021-04-01";
 
         /// <summary>
         /// Gets the tenants for your account.
@@ -25,6 +26,7 @@ namespace AzureTools.Client
         /// </summary>
         public static string ListResourcesForSubscription => $"/subscriptions/{{subscriptionId}}/resources?api-version={ResourcesVersion}&$expand=createdTime,changedTime";
 
+        public static string ListApiVersionForResourceProvider = $"/subscriptions/{{subscriptionId}}/providers/{{resourceProviderNamespace}}?api-version={GetResourceAPIVersion}";
 
     }
 }

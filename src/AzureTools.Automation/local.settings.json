@@ -11,6 +11,8 @@
     "AzureWebJobs.StartGraphGroupCollection.Disabled": "true",
     "AzureWebJobs.StartGraphApplicationRegistrationCollection.Disabled": "true",
     "AzureWebJobs.StartGraphServicePrincipalCollection.Disabled": "true",
-    "AzureWebJobs.StartGraphDirectoryRoleCollection.Disabled": "true"
+    "AzureWebJobs.StartGraphDirectoryRoleCollection.Disabled": "true",
+    "AzureWebJobs.StartARMTenantCollection.Disabled": "true",
+    "AzureWebJobs.StartARMSubscriptionCollection.Disabled": "true"
   }
 }

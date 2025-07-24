@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "AzureTools.Cli": {
+      "commandName": "Project",
+      "commandLineArgs": "list resource-properties --resourceid \"/subscriptions/244f16a3-3e97-48b3-acbf-d2b96b5746cb/resourceGroups/Kusto/providers/Microsoft.Kusto/clusters/dataoutput\""
+    }
+  }
+}

@@ -15,6 +15,8 @@
     [JsonSerializable(typeof(Sku))]
     [JsonSerializable(typeof(ExtendedLocation))]
     [JsonSerializable(typeof(UserAssignedIdentity))]
+    [JsonSerializable(typeof(ProviderResourceType))]
+    [JsonSerializable(typeof(Provider))]
     [JsonSerializable(typeof(ModelBase))]
     [JsonSerializable(typeof(User))]
     [JsonSourceGenerationOptions(WriteIndented = true)]
