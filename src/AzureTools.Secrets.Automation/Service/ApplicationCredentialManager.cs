@@ -8,6 +8,7 @@
     using System;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Logging;
+    using global::Kusto.Data.Common;
 
     public class ApplicationCredentialManager
     {
@@ -44,7 +45,12 @@
                 throw new Exception("Kusto query for expiring passwords is empty.");
             }
 
-            var results = await _kustoReader.ExecuteQueryAsync<ExpiringApplicationPassword>(_settings.DataSourceName, query, stopToken);
+            var results = await _kustoReader.ExecuteQueryAsync<ExpiringApplicationPassword>(
+                _settings.DataSourceName,
+                query,
+                ExpiringApplicationPassword.CreateFromReader,
+                stopToken,
+                new ClientRequestProperties());
 
             if ( results == null || results.Any() is false)
             {

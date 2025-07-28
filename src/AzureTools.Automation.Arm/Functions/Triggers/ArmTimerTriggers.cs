@@ -1,9 +1,9 @@
 // ArmTimerTriggers.cs Copyright (c) Aaron Randolph. All rights reserved.
 // Licensed under the MIT license. See License.txt in the project root for license information.
 
-namespace AzureTools.Automation.Functions.Triggers
+namespace AzureTools.Automation.Arm.Functions.Triggers
 {
-    using AzureTools.Automation.Collector;
+    using AzureTools.Automation.Arm.Collector;
     using Microsoft.Azure.Functions.Worker;
     using Microsoft.Extensions.Logging;
 
@@ -14,7 +14,7 @@ namespace AzureTools.Automation.Functions.Triggers
 
         public ArmTimerTriggers(ILoggerFactory loggerFactory, ARMCollector collector)
         {
-            _logger = loggerFactory.CreateLogger<TimerTriggers>();
+            _logger = loggerFactory.CreateLogger<ArmTimerTriggers>();
             _armCollector = collector ?? throw new ArgumentNullException(nameof(collector));
         }
 

@@ -15,15 +15,12 @@ namespace AzureTools.Automation.Functions.Triggers
     {
         private readonly ILogger<QueueTriggers> _logger;
         private readonly GraphCollector _graphCollector;
-        private readonly ARMCollector _armCollector;
 
         public QueueTriggers(ILogger<QueueTriggers> logger,
-            GraphCollector graphCollector,
-            ARMCollector armCollector)
+            GraphCollector graphCollector)
         {
             _logger = logger;
             _graphCollector = graphCollector;
-            _armCollector = armCollector;
         }
 
         [Function(nameof(ProcessObjectEnumerationQueue))]
@@ -147,64 +144,6 @@ namespace AzureTools.Automation.Functions.Triggers
             {
                 await _graphCollector.CollectApplicationRegistrationOwnersAsync(request, functionContext.CancellationToken);
             }
-        }
-
-        [Function(nameof(ProcessResourcePropertiesQueue))]
-        public async Task ProcessResourcePropertiesQueue(
-            [KafkaTrigger(
-               "%BrokerList%",
-               MessageTopics.ResourcePropertiesTopic,
-               ConsumerGroup = "%ConsumerGroup%",
-               Username = "%KafkaConnection%",
-               Password = "%ConnectionString%")] string kafkaMessage, FunctionContext functionContext)
-        {
-            var message = JsonDocument.Parse(kafkaMessage);
-            var parsed = message.RootElement
-                .GetProperty("Value")
-                .GetString();
-
-            if (string.IsNullOrWhiteSpace(parsed))
-            {
-                return;
-            }
-
-            var request = JsonUtil.Deserialize<ResourcePropertyMessage>(parsed);
-
-            if (request == null)
-            {
-                return;
-            }
-
-            await _armCollector.GetResourcePropertiesForResourceAsync(request, functionContext.CancellationToken);
-        }
-
-        [Function(nameof(ProcessSubscriptionsQueue))]
-        public async Task ProcessSubscriptionsQueue(
-            [KafkaTrigger(
-               "%BrokerList%",
-               MessageTopics.SubscriptionEnumerationTopic,
-               ConsumerGroup = "%ConsumerGroup%",
-               Username = "%KafkaConnection%",
-               Password = "%ConnectionString%")] string kafkaMessage, FunctionContext functionContext)
-        {
-            var message = JsonDocument.Parse(kafkaMessage);
-            var parsed = message.RootElement
-                .GetProperty("Value")
-                .GetString();
-
-            if (string.IsNullOrWhiteSpace(parsed))
-            {
-                return;
-            }
-
-            var request = JsonUtil.Deserialize<SubscriptionMessage>(parsed);
-
-            if (request == null)
-            {
-                return;
-            }
-
-            await _armCollector.CollectResourcesAsync(request, functionContext.CancellationToken);
         }
     }
 }

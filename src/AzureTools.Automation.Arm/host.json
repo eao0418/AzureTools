@@ -1,0 +1,26 @@
+{
+  "extensions": {
+    "kafka": {
+      "maxBatchSize": 64,
+      "SubscriberIntervalInSeconds": 1,
+      "ExecutorChannelCapacity": 1,
+      "ChannelFullRetryIntervalInMs": 50
+    }
+  },
+  "logging": {
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": true,
+        "excludedTypes": "Request"
+      },
+      "enableLiveMetricsFilters": true
+    },
+    "logLevel": {
+      "default": "Information",
+      "Host.Results": "Error",
+      "Function": "Trace",
+      "Host.Aggregator": "Trace"
+    }
+  },
+  "version": "2.0"
+}

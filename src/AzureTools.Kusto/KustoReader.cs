@@ -12,6 +12,7 @@ namespace AzureTools.Kusto
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Data;
     using System.Threading.Tasks;
 
     public class KustoReader : IKustoReader
@@ -49,12 +50,18 @@ namespace AzureTools.Kusto
         /// <param name="stopToken">The stop token.</param>
         /// <returns>An IEnumerable of results.</returns>
         /// <exception cref="InvalidOperationException">If there is no </exception>
-        public async Task<IEnumerable<T>> ExecuteQueryAsync<T>(string databaseName, string query, CancellationToken stopToken) where T : class, new()
+        public async Task<IEnumerable<T>> ExecuteQueryAsync<T>(
+            string databaseName,
+            string query,
+            Func<IDataReader, T> mapper,
+            CancellationToken stopToken,
+            ClientRequestProperties requestProperties) where T : class, new()
         {
             if (_providers.TryGetValue(databaseName, out var provider))
             {
-                var reader = await provider.ExecuteQueryAsync(databaseName, query, new ClientRequestProperties(), stopToken);
-                return reader.ToEnumerable<T>();
+                requestProperties ??= new ClientRequestProperties();
+                var reader = await provider.ExecuteQueryAsync(databaseName, query, requestProperties, stopToken);
+                return reader.ToEnumerable(mapper);
             }
 
             throw new InvalidOperationException($"No provider found for database '{databaseName}'. Ensure that the KustoReader is initialized with the correct settings.");

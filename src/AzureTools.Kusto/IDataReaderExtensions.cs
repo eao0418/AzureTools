@@ -9,24 +9,18 @@ namespace AzureTools.Kusto
 
     public static class IDataReaderExtensions
     {
-        public static IEnumerable<T> ToEnumerable<T>(this IDataReader reader) where T: class, new()
+        public static IEnumerable<T> ToEnumerable<T>(this IDataReader reader, Func<IDataReader, T> mapper) where T: class, new()
         {
             ArgumentNullException.ThrowIfNull(reader);
-            var properties = typeof(T).GetProperties();
             var result = new List<T>();
 
             while (reader.Read())
             {
-                var row = new T();
-                foreach (var prop in properties)
+                if (reader.FieldCount == 0)
                 {
-                    if (!reader.IsDBNull(reader.GetOrdinal(prop.Name)))
-                    {
-                        prop.SetValue(row, reader[prop.Name]);
-                    }
+                    continue; // Skip empty rows
                 }
-
-                result.Add(row);
+                result.Add(mapper.Invoke(reader));
             }
 
             return result;

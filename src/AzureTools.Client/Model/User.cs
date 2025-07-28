@@ -18,7 +18,7 @@ namespace AzureTools.Client.Model
         public List<string>? AuthenticationMethods { get; set; }
         public int DeviceEnrollmentLimit { get; set; }
         public string ExternalUserState { get; set; } = string.Empty;
-        public bool OnPremisesSyncEnabled { get; set; }
+        public bool? OnPremisesSyncEnabled { get; set; }
         public string Mail { get; set; } = string.Empty;
         public string DisplayName { get; set; } = string.Empty;
         public string GivenName { get; set; } = string.Empty;

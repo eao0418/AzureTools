@@ -28,11 +28,11 @@
                 //
                 if (s.UserProperties.Count == 0)
                 {
-                    s.UsersEndpoint = GraphEndpoints.UsersEndpoint;
+                    s.UsersEndpoint = GraphEndpoints.UsersEndpointBase;
                 }
                 else
                 {
-                    s.UsersEndpoint = $"{GraphEndpoints.UsersEndpointBase}{string.Join(",", s.UserProperties)}";
+                    s.UsersEndpoint = $"{GraphEndpoints.UsersEndpointBase}?$select={string.Join(",", s.UserProperties)}";
                 }
                 
                 if (s.GroupProperties.Count == 0)
@@ -90,7 +90,7 @@
                 }
 
             });
-            services.Configure<AuthenticationSettings>("graphAuthenticationSettings", config.GetSection("graphAuthenticationSettings"));
+            services.Configure<AuthenticationSettings>(config.GetSection("graphAuthenticationSettings"));
             services.AddHttpClient<GraphClient>(client =>
             {
                 client.BaseAddress = new Uri("https://graph.microsoft.com");
@@ -103,7 +103,7 @@
 
         public static IServiceCollection AddARMClient(this IServiceCollection services, IConfiguration config)
         {
-            services.Configure<AuthenticationSettings>("armAuthenticationSettings", config.GetSection("armAuthenticationSettings"));
+            services.Configure<AuthenticationSettings>(config.GetSection("armAuthenticationSettings"));
             services.AddHttpClient<ARMClient>(client =>
             {
                 client.DefaultRequestHeaders.Add("Accept", "application/json");

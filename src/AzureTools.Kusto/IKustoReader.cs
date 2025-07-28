@@ -3,12 +3,14 @@
 
 namespace AzureTools.Kusto
 {
+    using global::Kusto.Data.Common;
     using System.Collections.Generic;
+    using System.Data;
     using System.Threading;
     using System.Threading.Tasks;
 
     public interface IKustoReader
     {
-        Task<IEnumerable<T>> ExecuteQueryAsync<T>(string databaseName, string query, CancellationToken stopToken) where T : class, new();
+        Task<IEnumerable<T>> ExecuteQueryAsync<T>(string databaseName, string query, Func<IDataReader, T> mapper, CancellationToken stopToken, ClientRequestProperties requestProperties) where T : class, new();
     }
 }

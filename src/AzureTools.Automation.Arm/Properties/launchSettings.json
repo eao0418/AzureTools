@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "AzureTools": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7046"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "httpPort": 30968,
+      "useSSL": false
+    }
+  }
+}
