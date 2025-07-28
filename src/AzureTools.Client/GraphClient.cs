@@ -299,6 +299,7 @@ namespace AzureTools.Client
                     _logger.LogError("Response content: {Content}", content);
                     throw new HttpRequestException($"Request to {url} failed with status code {httpResponse.StatusCode}");
                 }
+
                 response = await httpResponse.Content.ReadFromJsonAsync<ODataResponse<T>>(new JsonSerializerOptions { PropertyNameCaseInsensitive = true }, stopToken)
                            ?? throw new InvalidOperationException("Failed to deserialize OData response.");
             }

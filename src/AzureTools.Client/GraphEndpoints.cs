@@ -14,12 +14,12 @@ namespace AzureTools.Client
         /// <summary>
         /// Base endpoint for Microsoft Graph API users.
         /// </summary>
-        public static string UsersEndpointBase => $"/{BetaVersion}/users?$select=";
+        public static string UsersEndpointBase => $"/{BetaVersion}/users";
 
         /// <summary>
         /// Endpoint for Microsoft Graph API users with specific fields selected.
         /// </summary>
-        public static string UsersEndpoint => $"{UsersEndpointBase}id,userPrincipalName,accountEnabled,riskLevel,assignedRoles,authenticationMethods,mail,displayName,givenName,surname,jobTitle,mobilePhone,officeLocation,businessPhones";
+        public static string UsersEndpoint => $"{UsersEndpointBase}";
 
         /// <summary>
         /// Base endpoint for Microsoft Graph API service principals.

@@ -1,14 +1,17 @@
 ﻿{
-  "authenticationSettings": {
+  "armAuthenticationSettings": {
+    "authenticationType": "ClientSecret",
     "tenantId": "",
-    "audience": "https://graph.microsoft.com/"
+    "audience": "https://management.azure.com/",
+    "password": "",
+    "clientId": ""
   },
   "kustoSettings": {
     "authenticationSettings": [
       {
         "authenticationType": "ClientSecret",
         "databaseName": "GraphData",
-        "clusterUrl": "https://<placeholder>.kusto.windows.net",
+        "clusterUrl": "https://cluster.centralus.kusto.windows.net/",
         "audience": "https://kusto.windows.net/",
         "tenantId": "",
         "password": "",
@@ -20,6 +23,6 @@
     "repositoryType": "kusto",
     "databaseName": "GraphData"
   },
-  "graphClientSettings":{
+  "graphClientSettings": {
   }
 }

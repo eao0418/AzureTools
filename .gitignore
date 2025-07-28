@@ -59,3 +59,6 @@ nunit-*.xml
 # custom
 src/AzureTools.Automation/config/local.config.json
 src/AzureTools.Cli/config.local.json
+**config.local.json
+src/AzureTools.Automation.Arm/config/local.config.json
+src/**/local.config.json

@@ -1,10 +1,10 @@
 ﻿// ARMCollector.cs Copyright (c) Aaron Randolph. All rights reserved.
 // Licensed under the MIT license. See License.txt in the project root for license information.
 
-namespace AzureTools.Automation.Collector
+namespace AzureTools.Automation.Arm.Collector
 {
     using AzureTools.Authentication.Settings;
-    using AzureTools.Automation.Messaging;
+    using AzureTools.Automation.Arm.Messaging;
     using AzureTools.Client;
     using AzureTools.Repository;
     using Microsoft.Extensions.Logging;
@@ -17,14 +17,13 @@ namespace AzureTools.Automation.Collector
         ILogger<ARMCollector> logger,
         IARMClient armClient,
         IObjectRepository objectRepository,
-        IOptionsMonitor<AuthenticationSettings> authSettingsOption,
+        IOptions<AuthenticationSettings> authSettingsOption,
         IMessageFactory messageFactory)
     {
-        private const string ArmAuthSettingsKey = "armAuthenticationSettings";
         private readonly ILogger<ARMCollector> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         private readonly IARMClient _armClient = armClient ?? throw new ArgumentNullException(nameof(armClient));
         private readonly IObjectRepository _objectRepository = objectRepository ?? throw new ArgumentNullException(nameof(objectRepository));
-        private readonly AuthenticationSettings _authSettings = authSettingsOption?.Get(ArmAuthSettingsKey) ?? throw new ArgumentNullException(nameof(authSettingsOption));
+        private readonly AuthenticationSettings _authSettings = authSettingsOption?.Value ?? throw new ArgumentNullException(nameof(authSettingsOption));
         private readonly IMessageFactory _messageFactory = messageFactory ?? throw new ArgumentNullException(nameof(messageFactory));
 
         /// <summary>

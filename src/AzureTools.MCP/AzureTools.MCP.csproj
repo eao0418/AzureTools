@@ -9,6 +9,7 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.EventHubs" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" />
@@ -18,12 +19,34 @@
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" />
     <PackageReference Include="Microsoft.Extensions.Options" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" OutputItemType="Analyzer" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Mcp" />
+    <PackageReference Include="System.Threading.Channels" />
+    <PackageReference Include="Microsoft.Azure.Kusto.Data" />
+  </ItemGroup>
+  <ItemGroup>
+    <FunctionsPreservedDependencies Include="System.Threading.Channels" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AzureTools.Authentication\AzureTools.Authentication.csproj" />
+    <ProjectReference Include="..\AzureTools.Common\AzureTools.Common.csproj" />
     <ProjectReference Include="..\AzureTools.Kusto\AzureTools.Kusto.csproj" />
     <ProjectReference Include="..\AzureTools.Utility\AzureTools.Utility.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Update="config\local.config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="host.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="local.settings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext" />
+  </ItemGroup>
+  
 </Project>

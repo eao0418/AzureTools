@@ -3,11 +3,13 @@
 
 namespace AzureTools.Kusto
 {
+    using AzureTools.Authentication;
     using AzureTools.Kusto;
     using AzureTools.Kusto.Authentication;
     using AzureTools.Kusto.Settings;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+    using System.Net.Security;
 
     public static class ServiceCollectionExtensions
     {
@@ -21,6 +23,7 @@ namespace AzureTools.Kusto
         public static IServiceCollection AddKustoWriter(this IServiceCollection services, IConfiguration config)
         {
             services.Configure<KustoSettings>(config.GetSection(KustoSettings.ConfigurationSectionName));
+            services.AddAuthenticationServices();
             services.AddSingleton<IKustoConnectionStringProvider, KustoConnectionStringProvider>();
             services.AddSingleton<IKustoWriter, KustoStreamWriter>();
             return services;
@@ -35,6 +38,7 @@ namespace AzureTools.Kusto
         public static IServiceCollection AddKustoReader(this IServiceCollection services, IConfiguration config)
         {
             services.Configure<KustoSettings>(config.GetSection(KustoSettings.ConfigurationSectionName));
+            services.AddAuthenticationServices();
             services.AddSingleton<IKustoConnectionStringProvider, KustoConnectionStringProvider>();
             services.AddSingleton<IKustoReader, KustoReader>();
             return services;
